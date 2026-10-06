@@ -3,12 +3,12 @@
 
 @font-face {
   font-family: "IRANSansLocal";
-  src: local("IRANSansWeb"), local("IRANSans"), local("IRANSansWeb Medium"), local("IRANSansWeb_Medium");
+  src: local("IRANSansWeb Medium"), local("IRANSansWeb-Medium"), local("IRANSansWeb"), local("IRANSans");
   font-weight: 400;
 }
 @font-face {
   font-family: "IRANSansLocal";
-  src: local("IRANSansWeb Bold"), local("IRANSansWeb_Bold"), local("IRANSans Bold");
+  src: local("IRANSansWeb Bold"), local("IRANSansWeb-Bold"), local("IRANSans Bold");
   font-weight: 700;
 }
 
@@ -79,6 +79,7 @@ pre code { background: none; padding: 0; }
 figure { margin: 2rem 0; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.2rem; }
 figure svg, figure canvas { display: block; margin: 0 auto; max-width: 100%; height: auto; }
 figcaption { color: var(--muted); font-size: .9rem; margin-top: .8rem; text-align: center; line-height: 1.8; }
+svg { direction: ltr; }
 svg text { font-family: var(--font); fill: var(--fg); }
 svg .muted { fill: var(--muted); stroke: var(--muted); }
 svg .grid line { stroke: var(--border); }
