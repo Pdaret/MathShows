@@ -1,0 +1,424 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>جبر خطی برای مهندس‌ها: بردار، ماتریس، پردازش تصویر و هوش مصنوعی — MathShows</title>
+  <meta name="description" content="بردار و ماتریس با شکل و مثال؛ فیلتر لاپلاس روی تصویر ۲۰۰×۲۰۰ قدم‌به‌قدم؛ نورون و شبکه‌ی عصبی به زبان ضرب ماتریس.">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <link rel="stylesheet" href="../../assets/css/main.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <script defer src="../../assets/js/la.js"></script>
+  <script defer src="../../assets/js/article.js"></script>
+  <script defer src="demos.js"></script>
+</head>
+<body>
+<header class="site-header"><a class="brand" href="../../">MathShows</a><span class="meta">ریاضیات با شکل و مثال</span></header>
+
+<!-- Shared SVG defs: arrowheads + grid pattern, referenced by every figure on the page -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <marker id="ah-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--accent)"/></marker>
+    <marker id="ah-2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--accent-2)"/></marker>
+    <marker id="ah-3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--accent-3)"/></marker>
+    <marker id="ah-4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--accent-4)"/></marker>
+    <marker id="ah-m" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--muted)"/></marker>
+    <pattern id="grid40" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0V40" fill="none" style="stroke:var(--border)"/></pattern>
+  </defs>
+</svg>
+
+<div class="layout">
+<article>
+  <p class="meta">جبر خطی · پردازش تصویر · هوش مصنوعی — زمان مطالعه حدود ۲۵ دقیقه</p>
+  <h1>جبر خطی برای مهندس‌ها: از بردار تا فیلتر لاپلاس و شبکه‌ی عصبی</h1>
+  <p class="lead">
+    تقریباً هر الگوریتمی که روی تصویر یا داده کار می‌کند، در نهایت به چند عمل ساده می‌رسد: جمع بردارها، ضرب داخلی و ضرب ماتریس.
+    در این مقاله این مفاهیم را با شکل و عدد می‌سازیم و بعد می‌بینیم چطور همین‌ها فیلتر لاپلاس و یک لایه‌ی شبکه‌ی عصبی را تشکیل می‌دهند.
+  </p>
+
+  <!-- ============================================================ -->
+  <h2 id="vectors">۱. بردار: یک فهرست مرتب از عددها</h2>
+  <p>
+    برای مهندس، بردار دو چهره دارد: <strong>هندسی</strong> (یک پیکان با طول و جهت) و <strong>داده‌ای</strong> (یک فهرست مرتب از عددها).
+    هر دو یک چیزند؛ بردار \(\mathbf{v} = (3, 2)\) یعنی «۳ واحد به راست و ۲ واحد به بالا».
+  </p>
+  $$\mathbf{v} = \begin{bmatrix} v_1 \\ v_2 \\ \vdots \\ v_n \end{bmatrix} \in \mathbb{R}^n$$
+  <figure>
+    <svg viewBox="0 0 320 250" width="320">
+      <rect x="0" y="0" width="320" height="250" fill="url(#grid40)"/>
+      <line class="axis" x1="40" y1="220" x2="305" y2="220" marker-end="url(#ah-m)"/>
+      <line class="axis" x1="40" y1="220" x2="40" y2="10" marker-end="url(#ah-m)"/>
+      <line x1="160" y1="140" x2="160" y2="220" stroke-dasharray="4 4" class="muted"/>
+      <line x1="160" y1="140" x2="40" y2="140" stroke-dasharray="4 4" class="muted"/>
+      <line x1="40" y1="220" x2="158" y2="141" style="stroke:var(--accent)" stroke-width="3" marker-end="url(#ah-1)"/>
+      <text x="168" y="132" style="fill:var(--accent)" font-weight="700">v = (3, 2)</text>
+      <text x="155" y="240" font-size="13">3</text>
+      <text x="26" y="145" font-size="13">2</text>
+      <text x="300" y="240" font-size="13">x</text>
+      <text x="48" y="18" font-size="13">y</text>
+    </svg>
+    <figcaption>شکل ۱ — بردار \((3,2)\): مؤلفه‌ها همان تصویر پیکان روی محورها هستند.</figcaption>
+  </figure>
+  <p>
+    همین ایده به ابعاد بالا تعمیم می‌یابد: دمای ۲۴ ساعت یک روز، برداری در \(\mathbb{R}^{24}\) است؛
+    یک تصویر خاکستری ۲۰۰×۲۰۰ برداری در \(\mathbb{R}^{40000}\). دیگر نمی‌توانیم پیکان را رسم کنیم، اما همه‌ی قواعد سر جایشان می‌مانند.
+  </p>
+
+  <h3>جمع بردارها و ضرب در عدد</h3>
+  <p>
+    جمع، مؤلفه‌به‌مؤلفه است و از نظر هندسی یعنی «پیکان‌ها را پشت هم بگذار» (قاعده‌ی متوازی‌الاضلاع).
+    ضرب در عدد (اسکالر) طول بردار را تغییر می‌دهد و اگر عدد منفی باشد جهتش را برعکس می‌کند.
+  </p>
+  $$\mathbf{a}+\mathbf{b} = \begin{bmatrix}3\\1\end{bmatrix}+\begin{bmatrix}1\\2\end{bmatrix}=\begin{bmatrix}4\\3\end{bmatrix},\qquad 2\mathbf{a} = \begin{bmatrix}6\\2\end{bmatrix}$$
+  <figure>
+    <svg viewBox="0 0 300 250" width="300">
+      <rect x="0" y="0" width="300" height="250" fill="url(#grid40)"/>
+      <line class="axis" x1="40" y1="220" x2="290" y2="220"/>
+      <line class="axis" x1="40" y1="220" x2="40" y2="10"/>
+      <line x1="160" y1="180" x2="200" y2="100" style="stroke:var(--accent-3)" stroke-width="2" stroke-dasharray="6 4"/>
+      <line x1="80" y1="140" x2="200" y2="100" style="stroke:var(--accent)" stroke-width="2" stroke-dasharray="6 4"/>
+      <line x1="40" y1="220" x2="158" y2="181" style="stroke:var(--accent)" stroke-width="3" marker-end="url(#ah-1)"/>
+      <line x1="40" y1="220" x2="79" y2="142" style="stroke:var(--accent-3)" stroke-width="3" marker-end="url(#ah-3)"/>
+      <line x1="40" y1="220" x2="198" y2="102" style="stroke:var(--accent-2)" stroke-width="3" marker-end="url(#ah-2)"/>
+      <text x="150" y="205" style="fill:var(--accent)" font-weight="700">a</text>
+      <text x="50" y="140" style="fill:var(--accent-3)" font-weight="700">b</text>
+      <text x="206" y="96" style="fill:var(--accent-2)" font-weight="700">a + b</text>
+    </svg>
+    <figcaption>شکل ۲ — جمع بردار: انتهای \(\mathbf{a}\) را ابتدای \(\mathbf{b}\) بگذارید (خط‌چین‌ها)؛ قطر متوازی‌الاضلاع \(\mathbf{a}+\mathbf{b}\) است.</figcaption>
+  </figure>
+
+  <h3>طول (نُرم) و ضرب داخلی</h3>
+  <p>طول بردار از فیثاغورس می‌آید. ضرب داخلی (dot product) دو بردار، یک عدد است:</p>
+  $$\|\mathbf{a}\| = \sqrt{a_1^2 + \dots + a_n^2}, \qquad \mathbf{a}\cdot\mathbf{b} = \sum_{i} a_i b_i = \|\mathbf{a}\|\,\|\mathbf{b}\|\cos\theta$$
+  <p>
+    ضرب داخلی مهم‌ترین عمل این مقاله است. معنای هندسی‌اش: «چقدر از \(\mathbf{a}\) در جهت \(\mathbf{b}\) است».
+    اگر صفر شود، دو بردار بر هم عمودند؛ اگر بزرگ و مثبت باشد، هم‌جهت‌اند.
+  </p>
+  <div class="callout example">
+    <strong>مثال</strong>
+    \(\mathbf{a}=(4,3)\) و \(\mathbf{b}=(6,0)\):
+    \(\mathbf{a}\cdot\mathbf{b} = 4\cdot6 + 3\cdot0 = 24\)، \(\|\mathbf{a}\|=5\)، \(\|\mathbf{b}\|=6\)
+    پس \(\cos\theta = 24/30 = 0.8\) و \(\theta \approx 36.9^\circ\).
+    طول تصویر \(\mathbf{a}\) روی \(\mathbf{b}\) برابر \(\mathbf{a}\cdot\mathbf{b}/\|\mathbf{b}\| = 4\) است.
+  </div>
+  <figure>
+    <svg viewBox="0 0 320 250" width="320">
+      <rect x="0" y="0" width="320" height="250" fill="url(#grid40)"/>
+      <line x1="200" y1="100" x2="200" y2="220" stroke-dasharray="5 4" class="muted"/>
+      <line x1="40" y1="220" x2="278" y2="220" style="stroke:var(--accent-3)" stroke-width="3" marker-end="url(#ah-3)"/>
+      <line x1="40" y1="224" x2="200" y2="224" style="stroke:var(--accent-2)" stroke-width="5" opacity=".8"/>
+      <line x1="40" y1="220" x2="198" y2="101" style="stroke:var(--accent)" stroke-width="3" marker-end="url(#ah-1)"/>
+      <path d="M70 220 A30 30 0 0 0 64 202" fill="none" class="muted" stroke-width="1.5"/>
+      <text x="76" y="212" font-size="13">θ</text>
+      <text x="205" y="95" style="fill:var(--accent)" font-weight="700">a = (4, 3)</text>
+      <text x="250" y="210" style="fill:var(--accent-3)" font-weight="700">b</text>
+      <text x="90" y="244" style="fill:var(--accent-2)" font-size="13">تصویر a روی b = 4</text>
+    </svg>
+    <figcaption>شکل ۳ — ضرب داخلی = طول تصویر (نارنجی) × طول \(\mathbf{b}\). این «سنجش شباهت» پایه‌ی فیلترها و نورون‌هاست.</figcaption>
+  </figure>
+
+  <!-- ============================================================ -->
+  <h2 id="matrices">۲. ماتریس: ماشینی که بردار را تبدیل می‌کند</h2>
+  <p>
+    ماتریس \(m\times n\) جدولی از عددهاست، اما مفید‌ترین نگاه به آن این است: <strong>تابعی که بردار \(n\)-بعدی می‌گیرد و بردار \(m\)-بعدی پس می‌دهد</strong>.
+    هر درایه‌ی خروجی، ضرب داخلی یک سطر ماتریس با بردار ورودی است:
+  </p>
+  $$A\mathbf{x} = \begin{bmatrix} a & b \\ c & d \end{bmatrix}\begin{bmatrix} x \\ y \end{bmatrix} = \begin{bmatrix} ax + by \\ cx + dy \end{bmatrix} = x\begin{bmatrix} a \\ c \end{bmatrix} + y\begin{bmatrix} b \\ d \end{bmatrix}$$
+  <p>
+    عبارت آخر کلید شهودی است: <span class="c2">ستون اول</span> جایی است که بردار پایه‌ی \(\hat{\imath}=(1,0)\) به آن می‌رود و
+    <span class="c3">ستون دوم</span> مقصد \(\hat{\jmath}=(0,1)\). پس با دیدن ستون‌ها می‌فهمید ماتریس با کل صفحه چه می‌کند.
+    مقدار <strong>دترمینان</strong> \(\det A = ad - bc\) هم نشان می‌دهد مساحت‌ها چند برابر می‌شوند؛ اگر صفر شود صفحه روی یک خط له می‌شود و تبدیل برگشت‌پذیر نیست.
+  </p>
+  <figure>
+    <canvas id="tf-canvas" width="360" height="360" aria-label="نمایش تبدیل خطی"></canvas>
+    <div class="controls">
+      <label>a <input id="tf-a" type="number" step="0.1" value="1" style="width:4.5em"></label>
+      <label>b <input id="tf-b" type="number" step="0.1" value="1" style="width:4.5em"></label>
+      <label>c <input id="tf-c" type="number" step="0.1" value="0" style="width:4.5em"></label>
+      <label>d <input id="tf-d" type="number" step="0.1" value="1" style="width:4.5em"></label>
+      <button id="tf-go">اعمال</button>
+    </div>
+    <div class="controls" id="tf-presets"></div>
+    <figcaption>
+      شکل ۴ (تعاملی) — شبکه‌ی خاکستری صفحه‌ی اصلی است و شبکه‌ی بنفش بعد از تبدیل.
+      <span class="c2">پیکان نارنجی</span> = ستون اول، <span class="c3">پیکان سبز</span> = ستون دوم، ناحیه‌ی آبی = تصویر مربع واحد (مساحتش = \(|\det A|\)).
+      <br><span id="tf-info" class="ltr"></span>
+    </figcaption>
+  </figure>
+
+  <h3>ضرب ماتریس در ماتریس</h3>
+  <p>
+    \(C = AB\) یعنی «اول \(B\) را اعمال کن، بعد \(A\)». درایه‌ی \(c_{ij}\) ضرب داخلی <strong>سطر \(i\)</strong> از \(A\) با <strong>ستون \(j\)</strong> از \(B\) است،
+    پس تعداد ستون‌های \(A\) باید با سطرهای \(B\) برابر باشد: \((m\times n)(n\times p) = (m\times p)\).
+  </p>
+  $$c_{ij} = \sum_{k=1}^{n} a_{ik}\,b_{kj}$$
+  <figure>
+    <svg id="matmul-svg" viewBox="0 0 420 170" width="420"></svg>
+    <figcaption>شکل ۵ (انیمیشن) — هر خانه‌ی \(C\) از ضرب داخلی سطر رنگی \(A\) و ستون رنگی \(B\) ساخته می‌شود.<br><span id="matmul-info" class="ltr"></span></figcaption>
+  </figure>
+  <div class="callout warn">
+    <strong>نکته‌ی مهندسی</strong>
+    ضرب ماتریس جابه‌جاپذیر نیست (\(AB \ne BA\)) و هزینه‌اش برای دو ماتریس \(n\times n\) حدود \(n^3\) ضرب است.
+    به همین دلیل GPUها اساساً «ماشین ضرب ماتریس» طراحی شده‌اند.
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="images">۳. تصویر، یک ماتریس است</h2>
+  <p>
+    تصویر خاکستری \(H\times W\) دقیقاً یک ماتریس است: درایه‌ی \(I[y][x]\) روشنایی پیکسل سطر \(y\) و ستون \(x\)، معمولاً بین ۰ (سیاه) تا ۲۵۵ (سفید).
+    تصویر رنگی سه ماتریس (R، G، B) روی هم است. پس هر عملی روی تصویر، عملی روی ماتریس است.
+  </p>
+  <figure>
+    <canvas id="pixel-canvas" class="pixel" width="408" height="408"></canvas>
+    <figcaption>شکل ۶ — یک تصویر ۱۲×۱۲ بزرگ‌نمایی شده؛ عدد هر خانه همان روشنایی پیکسل است.</figcaption>
+  </figure>
+  <p>اگر سطرها را پشت هم بچینیم (row-major)، تصویر به یک بردار تبدیل می‌شود؛ همان کاری که در حافظه‌ی کامپیوتر و ورودی شبکه‌های عصبی اتفاق می‌افتد:</p>
+  <figure>
+    <svg viewBox="0 0 470 140" width="470">
+      <g font-size="13" text-anchor="middle">
+        <rect x="20" y="30" width="90" height="30" style="fill:var(--accent)" fill-opacity=".25"/>
+        <rect x="20" y="60" width="90" height="30" style="fill:var(--accent-3)" fill-opacity=".25"/>
+        <rect x="20" y="90" width="90" height="30" style="fill:var(--accent-4)" fill-opacity=".25"/>
+        <path d="M20 30h90v90h-90zM50 30v90M80 30v90M20 60h90M20 90h90" fill="none" class="muted"/>
+        <text x="35" y="50">12</text><text x="65" y="50">40</text><text x="95" y="50">90</text>
+        <text x="35" y="80">33</text><text x="65" y="80">200</text><text x="95" y="80">71</text>
+        <text x="35" y="110">8</text><text x="65" y="110">55</text><text x="95" y="110">150</text>
+        <line x1="125" y1="75" x2="168" y2="75" class="axis" marker-end="url(#ah-m)"/>
+        <rect x="180" y="60" width="90" height="30" style="fill:var(--accent)" fill-opacity=".25"/>
+        <rect x="270" y="60" width="90" height="30" style="fill:var(--accent-3)" fill-opacity=".25"/>
+        <rect x="360" y="60" width="90" height="30" style="fill:var(--accent-4)" fill-opacity=".25"/>
+        <path d="M180 60h270v30h-270zM210 60v30M240 60v30M270 60v30M300 60v30M330 60v30M360 60v30M390 60v30M420 60v30" fill="none" class="muted"/>
+        <text x="195" y="80">12</text><text x="225" y="80">40</text><text x="255" y="80">90</text>
+        <text x="285" y="80">33</text><text x="315" y="80">200</text><text x="345" y="80">71</text>
+        <text x="375" y="80">8</text><text x="405" y="80">55</text><text x="435" y="80">150</text>
+        <text x="65" y="20">ماتریس ۳×۳</text>
+        <text x="315" y="45">بردار ۹ بعدی</text>
+        <text x="315" y="115" class="muted" style="stroke:none">اندیس = y·W + x</text>
+      </g>
+    </svg>
+    <figcaption>شکل ۷ — «تخت کردن» (flatten) تصویر: سطر به سطر کنار هم. برای تصویر ۲۰۰×۲۰۰، طول بردار ۴۰٬۰۰۰ است.</figcaption>
+  </figure>
+
+  <!-- ============================================================ -->
+  <h2 id="laplace">۴. فیلتر لاپلاس روی تصویر ۲۰۰×۲۰۰</h2>
+
+  <h3>ریاضیات: مشتق دوم گسسته</h3>
+  <p>
+    لبه در تصویر یعنی جایی که روشنایی ناگهان عوض می‌شود. مشتق اول در لبه بیشینه می‌شود و <strong>مشتق دوم در لبه علامت عوض می‌کند</strong> (از صفر عبور می‌کند).
+    در تصویر، فاصله‌ی پیکسل‌ها ۱ است، پس مشتق را با تفاضل تقریب می‌زنیم:
+  </p>
+  $$f''(x) \approx f(x+1) - 2f(x) + f(x-1) \quad\Rightarrow\quad \text{کرنل یک‌بعدی } [\,1,\ -2,\ 1\,]$$
+  <figure>
+    <svg id="profile-svg" viewBox="0 0 520 330" width="520"></svg>
+    <figcaption>شکل ۸ — یک سطر از تصویر با یک لبه‌ی نرم. مشتق اول (وسط) در لبه قله دارد؛ مشتق دوم (پایین) قبل از لبه مثبت، بعد از آن منفی است و در مرکز لبه از صفر می‌گذرد.</figcaption>
+  </figure>
+  <p>لاپلاسین مجموع مشتق‌های دوم در دو جهت است. با جمع کرنل افقی و عمودی، کرنل ۳×۳ مشهور به دست می‌آید:</p>
+  $$\nabla^2 I = \frac{\partial^2 I}{\partial x^2} + \frac{\partial^2 I}{\partial y^2}
+  \;\approx\; I[y][x{+}1] + I[y][x{-}1] + I[y{+}1][x] + I[y{-}1][x] - 4\,I[y][x]$$
+  $$K_4 = \begin{bmatrix} 0 & 1 & 0 \\ 1 & -4 & 1 \\ 0 & 1 & 0 \end{bmatrix} \qquad
+    K_8 = \begin{bmatrix} 1 & 1 & 1 \\ 1 & -8 & 1 \\ 1 & 1 & 1 \end{bmatrix}\ \text{(با قطرها)}$$
+  <p>
+    توجه کنید جمع درایه‌های کرنل صفر است؛ بنابراین روی ناحیه‌ی یکنواخت (و حتی روی شیب خطی) خروجی دقیقاً صفر می‌شود.
+  </p>
+
+  <h3>کانولوشن: لغزاندن کرنل روی تصویر</h3>
+  <p>
+    برای هر پیکسل، کرنل ۳×۳ را روی همسایگی‌اش می‌گذاریم، درایه‌ها را نظیربه‌نظیر ضرب و جمع می‌کنیم. این دقیقاً
+    <strong>ضرب داخلی</strong> بردار ۹تایی کرنل با بردار ۹تایی همسایگی است:
+  </p>
+  $$O[y][x] = \sum_{j=-1}^{1}\sum_{i=-1}^{1} K[j][i]\; I[y+j][x+i]$$
+  <figure>
+    <div class="side-by-side" id="slide-demo"></div>
+    <div class="controls">
+      <button id="slide-play">پخش</button>
+      <button id="slide-step" class="secondary">یک قدم</button>
+      <button id="slide-reset" class="secondary">از اول</button>
+    </div>
+    <figcaption>شکل ۹ (انیمیشن) — نسخه‌ی کوچک‌شده‌ی همان محاسبه‌ی ۲۰۰×۲۰۰: کرنل \(K_4\) روی تصویر ۷×۷ (یک مربع روشن ۲۰۰ روی زمینه‌ی ۲۰) می‌لغزد و خروجی ۵×۵ پر می‌شود. قرمز = مثبت، آبی = منفی.<br><span id="slide-info" class="ltr"></span></figcaption>
+  </figure>
+
+  <h3>مثال حل‌شده: یک لبه‌ی عمودی</h3>
+  <div class="callout example">
+    <strong>صورت مسئله</strong>
+    یک تکه‌ی ۵×۵ از تصویر داریم که در آن ستون‌های چپ تیره (۱۰) و ستون‌های راست روشن (۲۰۰) هستند. خروجی لاپلاس با \(K_4\) چیست؟
+  </div>
+  <table class="num-grid">
+    <tr><td>10</td><td>10</td><td>10</td><td>200</td><td>200</td></tr>
+    <tr><td>10</td><td>10</td><td>10</td><td>200</td><td>200</td></tr>
+    <tr><td>10</td><td>10</td><td>10</td><td>200</td><td>200</td></tr>
+    <tr><td>10</td><td>10</td><td>10</td><td>200</td><td>200</td></tr>
+    <tr><td>10</td><td>10</td><td>10</td><td>200</td><td>200</td></tr>
+  </table>
+  <p>کرنل را فقط جایی می‌گذاریم که کامل داخل تصویر باشد (حالت <code>valid</code>)، پس خروجی ۳×۳ است. سه ستون خروجی را حساب می‌کنیم:</p>
+  <ol>
+    <li>ستون ۲ (همه‌ی همسایه‌ها ۱۰): \(10+10+10+10-4\cdot10 = 0\) — ناحیه‌ی صاف.</li>
+    <li>ستون ۳ (پیکسل ۱۰ که همسایه‌ی راستش ۲۰۰ است): \(10+10+10+200-4\cdot10 = 190\) — طرف تیره‌ی لبه، <span class="c2">مثبت</span>.</li>
+    <li>ستون ۴ (پیکسل ۲۰۰ که همسایه‌ی چپش ۱۰ است): \(200+200+10+200-4\cdot200 = -190\) — طرف روشن لبه، <span class="c1">منفی</span>.</li>
+  </ol>
+  <table class="num-grid">
+    <tr><td>0</td><td style="color:var(--accent-2)">190</td><td style="color:var(--accent)">−190</td></tr>
+    <tr><td>0</td><td style="color:var(--accent-2)">190</td><td style="color:var(--accent)">−190</td></tr>
+    <tr><td>0</td><td style="color:var(--accent-2)">190</td><td style="color:var(--accent)">−190</td></tr>
+  </table>
+  <p>
+    <strong>تفسیر:</strong> خروجی در نواحی صاف صفر است و روی لبه یک جفت «مثبت/منفی» می‌سازد. محل دقیق لبه همان جایی است که علامت عوض می‌شود
+    (<em>zero-crossing</em>). اندازه‌ی ۱۹۰ با اختلاف روشنایی دو طرف \((200-10)\) متناسب است، یعنی لبه‌های پرکنتراست‌تر پاسخ قوی‌تری می‌دهند.
+  </p>
+
+  <h3>حالا تصویر ۲۰۰×۲۰۰</h3>
+  <p>همان محاسبه برای همه‌ی پیکسل‌ها تکرار می‌شود. چند نکته‌ی محاسباتی:</p>
+  <ul>
+    <li><strong>اندازه‌ی خروجی:</strong> در حالت <code>valid</code> خروجی \((200-2)\times(200-2) = 198\times198\) است. اگر بخواهیم ۲۰۰×۲۰۰ بماند، لبه‌های تصویر را <em>پد</em> می‌کنیم (مثلاً تکرار پیکسل مرزی — همان کاری که دموی زیر می‌کند).</li>
+    <li><strong>هزینه:</strong> با \(K_4\) هر پیکسل ۵ ضرب‌وجمع دارد، پس حدود \(40000 \times 5 = 200{,}000\) عمل؛ برای \(K_8\) حدود ۳۶۰ هزار. برای کامپیوتر ناچیز است.</li>
+    <li><strong>بازه‌ی مقادیر:</strong> ورودی ۰ تا ۲۵۵ است، اما خروجی \(K_4\) در بازه‌ی \([-1020,\ +1020]\) است و علامت دارد. برای نمایش، صفر را خاکستری میانی می‌گیریم یا قدرمطلق را نشان می‌دهیم.</li>
+    <li><strong>حساسیت به نویز:</strong> مشتق دوم نویز را بزرگ می‌کند. راه‌حل استاندارد: اول تصویر را با گاوسی صاف کنیم و بعد لاپلاس بگیریم (<em>LoG — Laplacian of Gaussian</em>). چون هر دو خطی‌اند، می‌توان آن‌ها را در یک کرنل ترکیب کرد.</li>
+  </ul>
+  <figure>
+    <div class="side-by-side fixed">
+      <div><canvas id="lp-src" class="pixel" width="200" height="200"></canvas><br>ورودی ۲۰۰×۲۰۰</div>
+      <div><canvas id="lp-signed" class="pixel" width="200" height="200"></canvas><br>لاپلاس (خاکستری = ۰، روشن = مثبت، تیره = منفی؛ مقیاس جذری)</div>
+      <div><canvas id="lp-abs" class="pixel" width="200" height="200"></canvas><br>|لاپلاس| — نقشه‌ی لبه</div>
+      <div><canvas id="lp-sharp" class="pixel" width="200" height="200"></canvas><br>تیز شده: \(I - \nabla^2 I\)</div>
+    </div>
+    <div class="controls">
+      <label>کرنل
+        <select id="lp-kernel"><option value="laplace4">K4 (۴-همسایگی)</option><option value="laplace8">K8 (۸-همسایگی)</option></select>
+      </label>
+      <label>نویز <input id="lp-noise" type="range" min="0" max="40" value="0"></label>
+      <label><input id="lp-smooth" type="checkbox"> صاف‌کردن گاوسی قبل از لاپلاس (LoG)</label>
+      <label>سطر نمودار <input id="lp-row" type="range" min="0" max="199" value="100"></label>
+      <label class="btn">عکس خودتان<input id="lp-file" type="file" accept="image/*" hidden></label>
+    </div>
+    <svg id="lp-profile" viewBox="0 0 520 200" width="520" style="margin-top:1rem"></svg>
+    <figcaption>
+      شکل ۱۰ (تعاملی) — ورودی: زمینه‌ای با <em>شیب خطی</em>، یک مستطیل، یک دایره و یک لکه‌ی نرم گاوسی.
+      نمودار پایین سطر انتخاب‌شده (خط نارنجی روی ورودی) را نشان می‌دهد: <span class="c1">روشنایی ورودی</span> و <span class="c2">خروجی لاپلاس</span>.
+      <br><span id="lp-stats" class="ltr"></span>
+    </figcaption>
+  </figure>
+  <h3>خروجی چه ویژگی‌ای را نشان می‌دهد؟</h3>
+  <ul>
+    <li><strong>لبه‌ها و مرزها</strong>، مستقل از جهت‌شان (لاپلاسین همسانگرد است؛ برخلاف Sobel که جهت‌دار است). دور مستطیل و دایره خطوط دوتایی روشن/تیره می‌بینید.</li>
+    <li><strong>نواحی صاف و شیب‌های خطی صفرند.</strong> زمینه‌ی شیب‌دار با اینکه روشنایی‌اش تغییر می‌کند، کاملاً خاکستری (صفر) می‌شود؛ چون مشتق دوم یک خط صفر است.</li>
+    <li><strong>تغییرات نرم پاسخ ضعیف می‌دهند:</strong> لکه‌ی گاوسی فقط یک هاله‌ی کم‌رنگ دارد؛ لاپلاس به «تیزی» حساس است نه به خود روشنایی.</li>
+    <li><strong>گوشه‌ها و نقاط منفرد</strong> قوی‌ترین پاسخ را دارند (نویز هم همین‌طور — اسلایدر نویز را امتحان کنید و بعد LoG را روشن کنید).</li>
+    <li><strong>تیز کردن:</strong> کم کردن لاپلاس از تصویر، دو طرف لبه را از هم دورتر می‌کند و تصویر تیزتر دیده می‌شود (unsharp-like).</li>
+  </ul>
+
+  <!-- ============================================================ -->
+  <h2 id="ai">۵. هوش مصنوعی: نورون = ضرب داخلی</h2>
+  <p>
+    یک نورون مصنوعی همان ضرب داخلی است به‌اضافه‌ی یک بایاس و یک تابع غیرخطی. وزن‌ها \(\mathbf{w}\) الگویی هستند که نورون دنبالش می‌گردد؛
+    هرچه ورودی به این الگو شبیه‌تر باشد (ضرب داخلی بزرگ‌تر)، نورون فعال‌تر می‌شود.
+  </p>
+  $$y = \sigma(\mathbf{w}\cdot\mathbf{x} + b), \qquad \operatorname{ReLU}(z) = \max(0, z)$$
+  <figure>
+    <svg viewBox="0 0 520 220" width="520">
+      <g font-size="14" text-anchor="middle">
+        <line x1="80" y1="50" x2="232" y2="102" class="muted"/>
+        <line x1="80" y1="110" x2="230" y2="110" class="muted"/>
+        <line x1="80" y1="170" x2="232" y2="118" class="muted"/>
+        <line x1="260" y1="30" x2="260" y2="78" class="muted" marker-end="url(#ah-m)"/>
+        <line x1="290" y1="110" x2="338" y2="110" class="muted" marker-end="url(#ah-m)"/>
+        <line x1="430" y1="110" x2="488" y2="110" class="muted" marker-end="url(#ah-m)"/>
+        <circle cx="60" cy="50" r="20" style="fill:var(--card);stroke:var(--accent)" stroke-width="2"/>
+        <circle cx="60" cy="110" r="20" style="fill:var(--card);stroke:var(--accent)" stroke-width="2"/>
+        <circle cx="60" cy="170" r="20" style="fill:var(--card);stroke:var(--accent)" stroke-width="2"/>
+        <text x="60" y="55">0.5</text><text x="60" y="115">0.8</text><text x="60" y="175">0.2</text>
+        <text x="20" y="55">x₁</text><text x="20" y="115">x₂</text><text x="20" y="175">x₃</text>
+        <text x="150" y="68" style="fill:var(--accent-2)">w₁=0.4</text>
+        <text x="150" y="104" style="fill:var(--accent-2)">w₂=−0.6</text>
+        <text x="150" y="160" style="fill:var(--accent-2)">w₃=0.9</text>
+        <text x="260" y="22" style="fill:var(--accent-3)">b = 0.3</text>
+        <circle cx="260" cy="110" r="30" style="fill:var(--card);stroke:var(--accent-4)" stroke-width="2"/>
+        <text x="260" y="117" font-size="20">Σ</text>
+        <rect x="340" y="90" width="90" height="40" rx="8" style="fill:var(--card);stroke:var(--accent-4)" stroke-width="2"/>
+        <text x="385" y="115">ReLU</text>
+        <text x="314" y="100" font-size="12">z=0.2</text>
+        <text x="505" y="104">y</text>
+        <text x="460" y="130" font-size="12">0.2</text>
+      </g>
+    </svg>
+    <figcaption>شکل ۱۱ — یک نورون با سه ورودی: \(z = 0.4(0.5) - 0.6(0.8) + 0.9(0.2) + 0.3 = 0.2\) و \(y = \operatorname{ReLU}(0.2) = 0.2\).</figcaption>
+  </figure>
+
+  <h3>لایه = ضرب ماتریس</h3>
+  <p>چند نورون موازی روی یک ورودی، یعنی وزن‌هایشان سطرهای یک ماتریس‌اند. کل لایه یک ضرب ماتریس در بردار است:</p>
+  $$\mathbf{y} = \operatorname{ReLU}(W\mathbf{x} + \mathbf{b}) =
+  \operatorname{ReLU}\!\left(\begin{bmatrix} 0.4 & -0.6 & 0.9 \\ 0.2 & 0.5 & -0.3 \end{bmatrix}
+  \begin{bmatrix} 0.5 \\ 0.8 \\ 0.2 \end{bmatrix} + \begin{bmatrix} 0.3 \\ -0.1 \end{bmatrix}\right)
+  = \operatorname{ReLU}\!\begin{bmatrix} 0.2 \\ 0.34 \end{bmatrix} = \begin{bmatrix} 0.2 \\ 0.34 \end{bmatrix}$$
+  <div class="callout example">
+    <strong>حل سطر دوم</strong>
+    \(0.2(0.5) + 0.5(0.8) - 0.3(0.2) - 0.1 = 0.1 + 0.4 - 0.06 - 0.1 = 0.34\).
+    یک شبکه‌ی عمیق چیزی جز تکرار همین «ضرب ماتریس + غیرخطی» نیست؛ آموزش شبکه یعنی پیدا کردن درایه‌های \(W\) و \(\mathbf{b}\).
+  </div>
+
+  <h3>طبقه‌بند خطی: ضرب داخلی به‌عنوان تصمیم</h3>
+  <p>
+    یک نورون تنها (بدون ReLU) صفحه را با خط \(\mathbf{w}\cdot\mathbf{x} + b = 0\) دو نیم می‌کند. بردار \(\mathbf{w}\) بر این خط عمود است
+    و علامت \(\mathbf{w}\cdot\mathbf{x} + b\) تعیین می‌کند نقطه در کدام کلاس است. با اسلایدرها خط را طوری بچرخانید که دو کلاس جدا شوند:
+  </p>
+  <figure>
+    <svg id="clf-svg" viewBox="0 0 320 320" width="320"></svg>
+    <div class="controls">
+      <label>زاویه‌ی w <input id="clf-theta" type="range" min="0" max="359" value="100"></label>
+      <label>بایاس b <input id="clf-b" type="range" min="-30" max="30" value="10"></label>
+    </div>
+    <figcaption>شکل ۱۲ (تعاملی) — ناحیه‌ی رنگی سمتی است که \(\mathbf{w}\cdot\mathbf{x}+b>0\) (کلاس نارنجی). نقاط حلقه‌دار اشتباه طبقه‌بندی شده‌اند.<br><span id="clf-info" class="ltr"></span></figcaption>
+  </figure>
+
+  <h3>چرا شبکه‌های تصویری از کانولوشن استفاده می‌کنند؟</h3>
+  <p>
+    اگر تصویر ۲۰۰×۲۰۰ را تخت کنیم (\(\mathbf{x}\in\mathbb{R}^{40000}\)) و به یک لایه‌ی کاملاً متصل با ۱۲۸ نورون بدهیم،
+    ماتریس \(W\) ابعاد \(128\times 40000\) یعنی <strong>۵٫۱۲ میلیون وزن</strong> دارد.
+    لایه‌ی کانولوشنی به‌جایش ۱۲۸ کرنل ۳×۳ یاد می‌گیرد: فقط \(128\times9 = 1152\) وزن.
+    کانولوشن در واقع همان ضرب ماتریس است، اما با ماتریسی <em>تُنُک</em> و <em>تکراری</em> (هر سطرش همان کرنل جابه‌جا شده است).
+    فیلتر لاپلاس که بالا دستی ساختیم، دقیقاً از جنس کرنل‌هایی است که لایه‌ی اول یک CNN خودش یاد می‌گیرد.
+  </p>
+  <table>
+    <tr><th>لایه</th><th>ورودی</th><th>تعداد وزن</th></tr>
+    <tr><td>Dense, 128</td><td>200×200 → 40000</td><td>5,120,000 + 128</td></tr>
+    <tr><td>Conv 3×3, 128</td><td>200×200×1</td><td>1,152 + 128</td></tr>
+  </table>
+
+  <h3>شباهت کسینوسی: معنای کلمات به‌شکل بردار</h3>
+  <p>
+    مدل‌های زبانی هر کلمه یا جمله را به یک بردار (embedding) نگاشت می‌کنند. شباهت معنایی = زاویه‌ی کوچک بین بردارها:
+  </p>
+  $$\operatorname{sim}(\mathbf{a},\mathbf{b}) = \frac{\mathbf{a}\cdot\mathbf{b}}{\|\mathbf{a}\|\,\|\mathbf{b}\|} = \cos\theta$$
+  <figure>
+    <svg viewBox="0 0 300 240" width="300">
+      <rect width="300" height="240" fill="url(#grid40)"/>
+      <line class="axis" x1="40" y1="200" x2="290" y2="200"/>
+      <line class="axis" x1="40" y1="200" x2="40" y2="5"/>
+      <line x1="40" y1="200" x2="198" y2="101" style="stroke:var(--accent)" stroke-width="3" marker-end="url(#ah-1)"/>
+      <line x1="40" y1="200" x2="218" y2="105" style="stroke:var(--accent-3)" stroke-width="3" marker-end="url(#ah-3)"/>
+      <line x1="40" y1="200" x2="80" y2="22" style="stroke:var(--accent-2)" stroke-width="3" marker-end="url(#ah-2)"/>
+      <text x="160" y="90" style="fill:var(--accent)" font-weight="700">گربه</text>
+      <text x="225" y="112" style="fill:var(--accent-3)" font-weight="700">سگ</text>
+      <text x="90" y="25" style="fill:var(--accent-2)" font-weight="700">ماشین</text>
+    </svg>
+    <figcaption>شکل ۱۳ — «گربه» \((4,2.5)\) و «سگ» \((4.5,2.4)\) زاویه‌ی کوچکی دارند (\(\cos\approx0.99\))؛ «ماشین» \((1,4.5)\) دور است (\(\cos\approx0.70\)). در مدل‌های واقعی ابعاد صدها یا هزاران است.</figcaption>
+  </figure>
+
+  <!-- ============================================================ -->
+  <h2 id="summary">۶. جمع‌بندی</h2>
+  <table>
+    <tr><th>مفهوم</th><th>در پردازش تصویر</th><th>در هوش مصنوعی</th></tr>
+    <tr><td>بردار</td><td>تصویر تخت‌شده، همسایگی پیکسل</td><td>ورودی، ویژگی، embedding</td></tr>
+    <tr><td>ضرب داخلی</td><td>یک خانه‌ی خروجی کانولوشن</td><td>یک نورون، شباهت کسینوسی</td></tr>
+    <tr><td>ماتریس</td><td>خود تصویر، کرنل</td><td>وزن‌های یک لایه</td></tr>
+    <tr><td>ضرب ماتریس</td><td>تبدیل هندسی، فیلتر خطی</td><td>عبور از یک لایه</td></tr>
+  </table>
+  <p>
+    قدم بعدی طبیعی: مقادیر و بردارهای ویژه، SVD و PCA (فشرده‌سازی تصویر و کاهش بُعد) — که در مقاله‌های بعدی می‌آیند.
+  </p>
+</article>
+<nav class="toc" aria-label="فهرست مطالب"><strong>فهرست</strong><ol></ol></nav>
+</div>
+
+<footer class="site-footer"><a href="../../">← همه‌ی مقاله‌ها</a><span>MathShows</span></footer>
+</body>
+</html>

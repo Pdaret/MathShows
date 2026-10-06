@@ -9,6 +9,7 @@
   const KERNELS = {
     laplace4: [[0, 1, 0], [1, -4, 1], [0, 1, 0]],
     laplace8: [[1, 1, 1], [1, -8, 1], [1, 1, 1]],
+    gauss3: [[1 / 16, 2 / 16, 1 / 16], [2 / 16, 4 / 16, 2 / 16], [1 / 16, 2 / 16, 1 / 16]],
   };
 
   // 2D correlation of a grayscale image (row-major Float32Array) with a square odd kernel.
