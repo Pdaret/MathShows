@@ -1,5 +1,7 @@
 /* ===== Font: IRANSans installed locally; Vazirmatn (OFL) as web fallback ===== */
-@import url("https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css");
+/* Self-hosted fonts: no CDN dependency (CDNs can be blocked/slow, which broke math glyphs). */
+@font-face { font-family: "Vazirmatn"; src: url("../vendor/vazirmatn/Vazirmatn-Regular.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "Vazirmatn"; src: url("../vendor/vazirmatn/Vazirmatn-Bold.woff2") format("woff2"); font-weight: 700; font-display: swap; }
 
 @font-face {
   font-family: "IRANSansLocal";
@@ -71,6 +73,8 @@ article p, article li { text-align: justify; }
 /* LTR islands inside RTL text */
 .katex, .ltr, code, pre { direction: ltr; unicode-bidi: isolate; }
 figcaption .ltr { display: inline-block; }
+/* IRANSans has an oversized U+00B7 glyph (700 units); render numeric/math readouts in mono */
+.ltr, svg .math { font-family: var(--mono); }
 .katex-display { overflow-x: auto; overflow-y: hidden; padding: .3rem 0; }
 code { font-family: var(--mono); background: var(--code-bg); padding: .1em .35em; border-radius: 4px; font-size: .88em; }
 pre { background: var(--code-bg); padding: 1rem; border-radius: 8px; overflow-x: auto; line-height: 1.6; text-align: left; }
