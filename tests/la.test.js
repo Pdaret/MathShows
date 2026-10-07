@@ -22,4 +22,9 @@ assert.ok(LA.convolve2d(ramp, 5, 5, LA.KERNELS.laplace4, "valid").data.every(v =
 const big = LA.convolve2d(new Float32Array(200 * 200), 200, 200, LA.KERNELS.laplace4);
 assert.deepStrictEqual([big.w, big.h], [200, 200]);
 
+// Two-stage RO mass balance from the membranes article.
+const q = LA.solve([[1, 1, 0, 0], [1, 0, 0, 0], [0, -1, 1, 1], [0, -0.3, 1, 0]], [100, 50, 0, 0]);
+assert.deepStrictEqual(q.map(v => +v.toFixed(9)), [50, 50, 15, 35]);
+assert.throws(() => LA.solve([[1, 2], [2, 4]], [1, 2]), /singular/);
+
 console.log("la.js: all checks passed");

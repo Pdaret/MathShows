@@ -51,4 +51,7 @@ near(M.upperBoundAlpha(1, M.ROBESON_2008.O2N2), 12.15, 0.01, "robeson");
 near(M.minEnergy(29.69, 0), 0.825, 0.001, "Wmin r=0");
 near(M.minEnergy(29.69, 0.5), 1.143, 0.001, "Wmin r=0.5");
 
+// RO recovery limit (demos-extra.js): brine osmotic pressure π_c = π_f/(1−r); seawater at r=0.5 ≈ 59 bar
+near(M.osmotic(35, 58.44) / (1 - 0.5), 59.38, 0.01, "pi brine r=0.5");
+
 console.log("membrane.js: all checks passed", { Jw: ro.Jw.toFixed(2), JwCP: roCP.Jw.toFixed(2), y3: y3.toFixed(3) });

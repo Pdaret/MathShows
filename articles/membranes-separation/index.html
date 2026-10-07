@@ -9,9 +9,11 @@
   <link rel="stylesheet" href="../../assets/css/main.css">
   <script defer src="../../assets/vendor/katex/katex.min.js"></script>
   <script defer src="../../assets/vendor/katex/auto-render.min.js"></script>
+  <script defer src="../../assets/js/la.js"></script>
   <script defer src="../../assets/js/membrane.js"></script>
   <script defer src="../../assets/js/article.js"></script>
   <script defer src="demos.js"></script>
+  <script defer src="demos-extra.js"></script>
   <style>
     .refs li { text-align: start; direction: ltr; font-size: .88rem; line-height: 1.7; margin-bottom: .4rem; }
     .readout { text-align: center; font-size: .9rem; margin-top: .6rem; line-height: 1.9; }
@@ -26,6 +28,7 @@
     <marker id="ah-2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--accent-2)"/></marker>
     <marker id="ah-3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--accent-3)"/></marker>
     <marker id="ah-m" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--muted)"/></marker>
+    <pattern id="mem-pores" width="8" height="8" patternUnits="userSpaceOnUse"><rect width="8" height="8" style="fill:var(--accent-4)" fill-opacity=".35"/><rect x="3" y="0" width="2" height="8" style="fill:var(--card)"/></pattern>
     <pattern id="pores" width="10" height="12" patternUnits="userSpaceOnUse"><rect width="10" height="8" style="fill:var(--fg)"/></pattern>
   </defs>
 </svg>
@@ -66,7 +69,7 @@
   <p>
     طبق تعریف IUPAC، غشا «ساختاری است با ابعاد جانبی بسیار بزرگ‌تر از ضخامتش، که انتقال جرم از میان آن تحت یک نیروی محرکه انجام می‌شود» [1].
     به زبان مهندسی: یک ورق یا لوله‌ی نازک (معمولاً پلیمری) که بعضی اجزا را راحت‌تر از بقیه عبور می‌دهد.
-    نیروی محرکه می‌تواند اختلاف <strong>فشار</strong> (فیلتراسیون، اسمز معکوس)، <strong>غلظت</strong> (دیالیز) یا <strong>فشار جزئی</strong> (جداسازی گاز) باشد.
+    نیروی محرکه می‌تواند اختلاف <strong>فشار</strong> (فیلتراسیون، اسمز معکوس)، <strong>غلظت</strong> (دیالیز)، <strong>میدان الکتریکی</strong> (الکترودیالیز) یا <strong>فشار جزئی</strong> (جداسازی گاز) باشد (بخش ۳ را ببینید).
   </p>
   <figure>
     <svg viewBox="0 0 640 230" width="640">
@@ -97,6 +100,15 @@
       <text x="470" y="208" text-anchor="middle" font-size="12" class="muted">لایه‌ی رسوب نازک و پایدار می‌ماند</text>
     </svg>
     <figcaption>شکل ۱ — دو آرایش پایه. صافی قهوه «بن‌بست» است؛ تقریباً همه‌ی واحدهای صنعتی «جریان متقاطع»اند و یک ورودی و دو خروجی دارند.</figcaption>
+  </figure>
+
+  <figure>
+    <div class="side-by-side">
+      <div><svg id="deadend-svg" viewBox="0 0 220 200" width="220"></svg><br>بن‌بست: کیک رشد می‌کند</div>
+      <div><svg id="crossflow-svg" viewBox="0 0 220 200" width="220"></svg><br>متقاطع: ذرات شسته می‌شوند</div>
+    </div>
+    <div class="controls"><button id="flow-reset" class="secondary">از اول</button></div>
+    <figcaption>شکل ۲ (انیمیشن) — ارتفاع لایه‌ی نارنجی ضخامت کیک است. در حالت بن‌بست شار با رشد کیک کم می‌شود (پیکان‌های آبی کم‌رنگ‌تر می‌شوند).</figcaption>
   </figure>
 
   <h3>سه عدد کلیدی</h3>
@@ -149,7 +161,7 @@
         <rect x="467" y="160" width="110" height="12" rx="6" class="muted" opacity=".5"/><text x="522" y="188" text-anchor="middle">باکتری</text>
       </g>
     </svg>
-    <figcaption>شکل ۲ — هر غشا هر چیزی بزرگ‌تر از بازه‌ی خودش را نگه می‌دارد. اعداد فشار، محدوده‌ی کاری معمول‌اند (اسمز معکوس آب دریا: ۵۵ تا ۸۰ بار).</figcaption>
+    <figcaption>شکل ۳ — هر غشا هر چیزی بزرگ‌تر از بازه‌ی خودش را نگه می‌دارد. اعداد فشار، محدوده‌ی کاری معمول‌اند (اسمز معکوس آب دریا: ۵۵ تا ۸۰ بار).</figcaption>
   </figure>
   <table>
     <tr><th>فرایند</th><th>چه چیزی را نگه می‌دارد</th><th>کاربرد نمونه</th></tr>
@@ -167,7 +179,91 @@
       <button class="secondary" data-sieve="RO">RO</button>
     </div>
     <div id="sieve-out" class="readout"></div>
-    <figcaption>شکل ۳ (انیمیشن) — ذرات از چپ به غشا می‌خورند. با عوض کردن نوع غشا ببینید چه چیزی رد می‌شود و چه چیزی پشت غشا انباشته می‌شود (همان «کیک» که در بخش ۵ مدلش می‌کنیم). در NF یون تک‌ظرفیتی نیمه‌کاره رد می‌شود؛ این واقعی است — NF برای Na⁺Cl⁻ پس‌زنی متوسط و برای Ca²⁺ و SO₄²⁻ پس‌زنی بالا دارد [2].</figcaption>
+    <figcaption>شکل ۴ (انیمیشن) — ذرات از چپ به غشا می‌خورند. با عوض کردن نوع غشا ببینید چه چیزی رد می‌شود و چه چیزی پشت غشا انباشته می‌شود (همان «کیک» که در بخش ۵ مدلش می‌کنیم). در NF یون تک‌ظرفیتی نیمه‌کاره رد می‌شود؛ این واقعی است — NF برای Na⁺Cl⁻ پس‌زنی متوسط و برای Ca²⁺ و SO₄²⁻ پس‌زنی بالا دارد [2].</figcaption>
+  </figure>
+
+  <h3>نیروی محرکه: همه‌چیز فشار نیست</h3>
+  <p>
+    MF تا RO با <strong>اختلاف فشار</strong> کار می‌کنند. اما خانواده‌ی غشاها بزرگ‌تر است:
+  </p>
+  <figure>
+    <svg viewBox="0 0 560 190" width="560">
+      <g font-size="13" text-anchor="middle">
+        <g transform="translate(10,20)">
+          <rect width="125" height="150" rx="10" fill="none" style="stroke:var(--accent)" stroke-width="2"/>
+          <text x="62" y="28" font-weight="700" style="fill:var(--accent)">فشار ΔP</text>
+          <line x1="62" y1="45" x2="62" y2="95" style="stroke:var(--accent)" stroke-width="4" marker-end="url(#ah-1)"/>
+          <rect x="15" y="100" width="95" height="8" fill="url(#mem-pores)"/>
+          <text x="62" y="135">MF, UF, NF, RO</text>
+        </g>
+        <g transform="translate(150,20)">
+          <rect width="125" height="150" rx="10" fill="none" style="stroke:var(--accent-3)" stroke-width="2"/>
+          <text x="62" y="28" font-weight="700" style="fill:var(--accent-3)">غلظت ΔC</text>
+          <rect x="15" y="50" width="40" height="55" style="fill:var(--accent-3)" fill-opacity=".55"/>
+          <rect x="70" y="50" width="40" height="55" style="fill:var(--accent-3)" fill-opacity=".15"/>
+          <rect x="58" y="45" width="8" height="65" fill="url(#mem-pores)"/>
+          <text x="62" y="135">دیالیز، اسمز مستقیم</text>
+        </g>
+        <g transform="translate(290,20)">
+          <rect width="125" height="150" rx="10" fill="none" style="stroke:var(--accent-2)" stroke-width="2"/>
+          <text x="62" y="28" font-weight="700" style="fill:var(--accent-2)">میدان الکتریکی</text>
+          <text x="20" y="80" font-size="22">−</text><text x="105" y="80" font-size="22">+</text>
+          <rect x="40" y="45" width="6" height="65" style="fill:var(--accent)"/>
+          <rect x="80" y="45" width="6" height="65" style="fill:var(--accent-2)"/>
+          <text x="62" y="135">الکترودیالیز، پیل سوختی</text>
+        </g>
+        <g transform="translate(430,20)">
+          <rect width="125" height="150" rx="10" fill="none" style="stroke:var(--accent-4)" stroke-width="2"/>
+          <text x="62" y="28" font-weight="700" style="fill:var(--accent-4)">دما / فشار جزئی</text>
+          <path d="M20 95 q10 -20 20 0 t20 0" fill="none" style="stroke:var(--accent-4)" stroke-width="2"/>
+          <rect x="70" y="45" width="8" height="65" fill="url(#mem-pores)"/>
+          <line x1="85" y1="75" x2="110" y2="75" style="stroke:var(--accent-4)" stroke-width="2" stroke-dasharray="3 3"/>
+          <text x="62" y="135">تقطیر غشایی، تراوش تبخیری، جداسازی گاز</text>
+        </g>
+      </g>
+    </svg>
+    <figcaption>شکل ۵ — چهار نوع نیروی محرکه. نوع نیرو تعیین می‌کند غشا از چه جنسی باشد و انرژی از کجا تأمین شود.</figcaption>
+  </figure>
+
+  <h3>جنس و ساختار</h3>
+  <ul>
+    <li><strong>پلیمری:</strong> PES و PVDF برای MF/UF؛ لایه‌ی پلی‌آمید بسیار نازک (حدود ۱۰۰–۲۰۰ نانومتر) روی زیرلایه‌ی متخلخل برای RO و NF که به آن <em>کامپوزیت لایه‌نازک (TFC)</em> می‌گویند. ارزان، اما به کلر و دمای بالا حساس.</li>
+    <li><strong>سرامیکی:</strong> آلومینا، زیرکونیا. مقاوم در برابر دما، اسید و حلال؛ گران‌تر. در صنایع غذایی و پساب‌های سخت.</li>
+    <li><strong>ساختار نامتقارن:</strong> یک «پوسته»ی نازک که کار جداسازی را انجام می‌دهد، روی یک لایه‌ی ضخیم و متخلخل که فقط استحکام مکانیکی می‌دهد. چون مقاومت با ضخامت متناسب است، پوسته را تا جای ممکن نازک می‌سازند.</li>
+  </ul>
+  <figure>
+    <svg viewBox="0 0 560 200" width="560">
+      <g font-size="13" text-anchor="middle">
+        <g transform="translate(10,10)">
+          <circle cx="60" cy="80" r="60" fill="none" style="stroke:var(--accent)" stroke-width="2"/>
+          <path d="M60 80 m-52 0 a52 52 0 1 0 104 0 a52 52 0 1 0 -104 0" fill="none" style="stroke:var(--accent-4)" stroke-width="8" stroke-dasharray="2 4"/>
+          <circle cx="60" cy="80" r="6" style="fill:var(--accent)"/>
+          <text x="60" y="170">مارپیچی (Spiral-wound)</text>
+          <text x="60" y="188" class="muted" style="stroke:none" font-size="11">RO و NF</text>
+        </g>
+        <g transform="translate(150,10)">
+          <rect x="5" y="20" width="110" height="120" rx="8" fill="none" class="muted"/>
+          <g id="hf-fibers"></g>
+          <text x="60" y="170">الیاف توخالی (Hollow fiber)</text>
+          <text x="60" y="188" class="muted" style="stroke:none" font-size="11">UF، دیالیز، گاز</text>
+        </g>
+        <g transform="translate(290,10)">
+          <rect x="10" y="20" width="100" height="120" fill="none" class="muted"/>
+          <rect x="10" y="40" width="100" height="6" fill="url(#mem-pores)"/>
+          <rect x="10" y="70" width="100" height="6" fill="url(#mem-pores)"/>
+          <rect x="10" y="100" width="100" height="6" fill="url(#mem-pores)"/>
+          <text x="60" y="170">صفحه و قاب</text>
+          <text x="60" y="188" class="muted" style="stroke:none" font-size="11">آزمایشگاه، الکترودیالیز</text>
+        </g>
+        <g transform="translate(430,10)">
+          <rect x="10" y="50" width="100" height="40" rx="20" fill="none" style="stroke:var(--accent-4)" stroke-width="6"/>
+          <line x1="0" y1="70" x2="40" y2="70" style="stroke:var(--accent-2)" stroke-width="3" marker-end="url(#ah-2)"/>
+          <text x="60" y="170">لوله‌ای (Tubular)</text>
+          <text x="60" y="188" class="muted" style="stroke:none" font-size="11">سرامیکی، خوراک کثیف</text>
+        </g>
+      </g>
+    </svg>
+    <figcaption>شکل ۶ — چهار شکل رایج مدول. مدول یعنی بسته‌بندی غشا طوری که در حجم کم، سطح زیادی جا شود (تا ۱۰٬۰۰۰ متر مربع بر متر مکعب برای الیاف توخالی).</figcaption>
   </figure>
 
   <!-- ============================================================ -->
@@ -193,7 +289,7 @@
   </ul>
   <p>
     نکته‌ی مهم <strong>توان ۲ روی شعاع</strong> است: نصف کردن اندازه‌ی منفذ، شار را <strong>چهار برابر</strong> کم می‌کند.
-    به همین دلیل غشاهای ریزتر فشار بیشتری لازم دارند (شکل ۲)، و به همین دلیل سازنده‌ها لایه‌ی انتخاب‌گر را تا حد ممکن نازک می‌کنند
+    به همین دلیل غشاهای ریزتر فشار بیشتری لازم دارند (شکل ۳)، و به همین دلیل سازنده‌ها لایه‌ی انتخاب‌گر را تا حد ممکن نازک می‌کنند
     (غشاهای «نامتقارن»: یک پوسته‌ی نازک روی یک پایه‌ی ضخیم و پرمنفذ).
   </p>
   <div class="callout example">
@@ -211,7 +307,7 @@
       <label>فشار ΔP: <input id="hp-dp" type="range" min="0.1" max="5" step="0.1" value="1"><span id="hp-dp-v"></span> bar</label>
     </div>
     <div id="hp-out" class="readout"></div>
-    <figcaption>شکل ۴ (ماشین‌حساب) — \(\tau=2\) و آب ۲۰°C. شعاع را دو برابر کنید و ببینید شار چهار برابر می‌شود؛ ضخامت را نصف کنید و شار دو برابر می‌شود.</figcaption>
+    <figcaption>شکل ۷ (ماشین‌حساب) — \(\tau=2\) و آب ۲۰°C. شعاع را دو برابر کنید و ببینید شار چهار برابر می‌شود؛ ضخامت را نصف کنید و شار دو برابر می‌شود.</figcaption>
   </figure>
   <div class="callout warn">
     <strong>محدودیت مدل</strong>
@@ -256,8 +352,45 @@
       <label>ضریب کیک K: <input id="ck-k" type="range" min="12" max="14" step="0.1" value="13"><span id="ck-k-v" class="ltr"></span> m⁻²</label>
     </div>
     <div id="ck-out" class="readout"></div>
-    <figcaption>شکل ۵ — شار در فیلتراسیون بن‌بست (\(R_m = 10^{12}\ \text{m}^{-1}\)). خط‌چین خاکستری حالت مرجع مثال بالاست. فشار را ۴ برابر کنید: شار اولیه ۴ برابر می‌شود اما بعد از یک ساعت فقط حدود ۲ برابر است.</figcaption>
+    <figcaption>شکل ۸ — شار در فیلتراسیون بن‌بست (\(R_m = 10^{12}\ \text{m}^{-1}\)). خط‌چین خاکستری حالت مرجع مثال بالاست. فشار را ۴ برابر کنید: شار اولیه ۴ برابر می‌شود اما بعد از یک ساعت فقط حدود ۲ برابر است.</figcaption>
   </figure>
+
+  <h3>انواع گرفتگی و مقابله با آن</h3>
+  <figure>
+    <svg viewBox="0 0 560 170" width="560">
+      <g font-size="13" text-anchor="middle">
+        <g transform="translate(0,0)">
+          <rect x="15" y="100" width="110" height="10" fill="url(#mem-pores)"/>
+          <circle cx="35" cy="88" r="10" style="fill:var(--accent-2)" opacity=".8"/><circle cx="60" cy="90" r="8" style="fill:var(--accent-2)" opacity=".8"/>
+          <circle cx="85" cy="86" r="12" style="fill:var(--accent-2)" opacity=".8"/><circle cx="108" cy="90" r="8" style="fill:var(--accent-2)" opacity=".8"/>
+          <circle cx="50" cy="72" r="9" style="fill:var(--accent-2)" opacity=".8"/>
+          <text x="70" y="140" font-weight="700">ذره‌ای</text><text x="70" y="158" class="muted" style="stroke:none" font-size="11">رس، لای، کیک</text>
+        </g>
+        <g transform="translate(140,0)">
+          <rect x="15" y="100" width="110" height="10" fill="url(#mem-pores)"/>
+          <path d="M15 98 q15 -18 30 0 t30 0 t30 0 t20 0" fill="none" style="stroke:var(--accent-3)" stroke-width="5"/>
+          <text x="70" y="140" font-weight="700">آلی</text><text x="70" y="158" class="muted" style="stroke:none" font-size="11">هیومیک، پروتئین، روغن</text>
+        </g>
+        <g transform="translate(280,0)">
+          <rect x="15" y="100" width="110" height="10" fill="url(#mem-pores)"/>
+          <path d="M20 99 q20 -40 50 -30 q35 10 50 30 z" style="fill:var(--accent-3)" fill-opacity=".3"/>
+          <ellipse cx="50" cy="88" rx="7" ry="4" style="fill:var(--accent-3)"/><ellipse cx="75" cy="80" rx="7" ry="4" style="fill:var(--accent-3)"/><ellipse cx="95" cy="90" rx="7" ry="4" style="fill:var(--accent-3)"/>
+          <text x="70" y="140" font-weight="700">زیستی</text><text x="70" y="158" class="muted" style="stroke:none" font-size="11">باکتری + بیوفیلم</text>
+        </g>
+        <g transform="translate(420,0)">
+          <rect x="15" y="100" width="110" height="10" fill="url(#mem-pores)"/>
+          <polygon points="30,99 40,70 50,99" style="fill:var(--accent)"/><polygon points="55,99 68,60 80,99" style="fill:var(--accent)"/><polygon points="85,99 95,78 105,99" style="fill:var(--accent)"/>
+          <text x="70" y="140" font-weight="700">رسوب معدنی</text><text x="70" y="158" class="muted" style="stroke:none" font-size="11">CaCO₃، CaSO₄، سیلیس</text>
+        </g>
+      </g>
+    </svg>
+    <figcaption>شکل ۹ — چهار نوع گرفتگی. رسوب معدنی وقتی رخ می‌دهد که \(C_m\) (نه \(C_b\)) از حد حلالیت بگذرد؛ پس قطبش غلظت (بخش ۶) مستقیم به رسوب‌گذاری ربط دارد.</figcaption>
+  </figure>
+  <ul>
+    <li><strong>پیشگیری:</strong> پیش‌تصفیه (UF قبل از RO)، ضدرسوب (antiscalant)، تنظیم pH، محدود کردن بازیافت.</li>
+    <li><strong>درمان:</strong> شست‌وشوی معکوس (MF/UF)، شست‌وشوی شیمیایی درجا (CIP): اسید برای رسوب معدنی، باز برای آلی و زیستی.</li>
+    <li><strong>پایش:</strong> افت شار نرمال‌شده، افزایش اختلاف فشار طول مدول و افت دفع نمک.</li>
+  </ul>
 
   <!-- ============================================================ -->
   <h2 id="reverse-osmosis">۶. اسمز و اسمز معکوس: شیرین کردن آب دریا</h2>
@@ -293,7 +426,7 @@
         <text x="530" y="200" text-anchor="middle" font-size="13">آب شور</text>
       </g>
     </svg>
-    <figcaption>شکل ۶ — آب خودبه‌خود از سمت رقیق به سمت غلیظ می‌رود. اختلاف ارتفاع تعادلی همان فشار اسمزی \(\pi\) است. اگر روی سمت شور فشاری بیش از \(\pi\) بگذاریم، جهت جریان برعکس می‌شود.</figcaption>
+    <figcaption>شکل ۱۰ — آب خودبه‌خود از سمت رقیق به سمت غلیظ می‌رود. اختلاف ارتفاع تعادلی همان فشار اسمزی \(\pi\) است. اگر روی سمت شور فشاری بیش از \(\pi\) بگذاریم، جهت جریان برعکس می‌شود.</figcaption>
   </figure>
 
   <h3>فشار اسمزی: معادله‌ی وانت‌هوف</h3>
@@ -358,7 +491,7 @@
       <text x="40" y="30" font-size="12" text-anchor="end">C</text>
       <text x="395" y="212" font-size="12" class="muted">x</text>
     </svg>
-    <figcaption>شکل ۷ — پروفیل غلظت نزدیک غشا. هرچه شار بیشتر یا اختلاط ضعیف‌تر (\(k\) کوچک‌تر)، قله‌ی \(C_m\) بلندتر می‌شود.</figcaption>
+    <figcaption>شکل ۱۱ — پروفیل غلظت نزدیک غشا. هرچه شار بیشتر یا اختلاط ضعیف‌تر (\(k\) کوچک‌تر)، قله‌ی \(C_m\) بلندتر می‌شود.</figcaption>
   </figure>
   <p>
     \(k\) ضریب انتقال جرم است و به هیدرودینامیک کانال بستگی دارد (سرعت جریان متقاطع و توری‌های فاصله‌انداز). این یعنی دو اثر بد هم‌زمان:
@@ -379,7 +512,25 @@
       <label><input id="ro-cp" type="checkbox"> قطبش غلظت، k: <input id="ro-k" type="range" min="20" max="300" step="5" value="100"><span id="ro-k-v"></span> LMH</label>
     </div>
     <div id="ro-out" class="readout"></div>
-    <figcaption>شکل ۸ — شار آب برحسب فشار (\(B = 0.05\) LMH). تا فشار اسمزی (خط‌چین سبز) عملاً آبی رد نمی‌شود؛ بعد از آن شار خطی بالا می‌رود. شوری را روی ۲ g/L (آب لب‌شور) بگذارید تا ببینید چرا آن واحدها با ۱۰ تا ۱۵ بار کار می‌کنند. قطبش را روشن کنید تا منحنی نارنجی جدا شود.</figcaption>
+    <figcaption>شکل ۱۲ — شار آب برحسب فشار (\(B = 0.05\) LMH). تا فشار اسمزی (خط‌چین سبز) عملاً آبی رد نمی‌شود؛ بعد از آن شار خطی بالا می‌رود. شوری را روی ۲ g/L (آب لب‌شور) بگذارید تا ببینید چرا آن واحدها با ۱۰ تا ۱۵ بار کار می‌کنند. قطبش را روشن کنید تا منحنی نارنجی جدا شود.</figcaption>
+  </figure>
+
+  <h3>بازیافت و فشار لازم</h3>
+  <p>
+    با جداشدن آب، نمک در جریان ناتراوه جمع می‌شود. اگر دفع کامل باشد، موازنه‌ی نمک می‌دهد
+    \(C_c = C_f/(1-r)\). پس فشار اسمزی در انتهای مدول \(\pi_c = \pi_f/(1-r)\) است و پمپ باید حداقل این فشار را بدهد.
+    با \(r = 0.5\) برای آب دریا: \(\pi_c = 29.7/0.5 \approx 59\ \text{bar}\) (با مقدار اندازه‌گیری‌شده‌ی ۲۷ بار، حدود ۵۴ بار).
+    به همین دلیل آب‌شیرین‌کن‌های دریایی معمولاً با ۴۰ تا ۵۰٪ بازیافت و ۵۵ تا ۷۰ بار کار می‌کنند؛ این همان کف ترمودینامیکی است که در بخش انرژی پایین‌تر می‌بینیم.
+  </p>
+  <figure>
+    <svg id="rr-svg" viewBox="0 0 520 280" width="520"></svg>
+    <div class="controls">
+      <label>شوری خوراک (g/L) <input id="rr-cf" type="range" min="1" max="45" value="35"></label>
+      <label>بازیافت r (٪) <input id="rr-r" type="range" min="5" max="80" value="45"></label>
+      <label>فشار پمپ ΔP (bar) <input id="rr-dp" type="range" min="5" max="85" value="65"></label>
+    </div>
+    <figcaption>شکل ۱۳ (تعاملی) — منحنی نارنجی حداقل فشار لازم برای هر بازیافت است (\(\pi_c\)). خط آبی فشار پمپ است. نقطه‌ای که پایین‌تر از منحنی بیفتد شدنی نیست.
+      <br><span id="rr-info" class="ltr"></span></figcaption>
   </figure>
 
   <h3>حداقل انرژی شیرین‌سازی</h3>
@@ -396,8 +547,65 @@
     نیروگاه‌های امروزی با بازیافت انرژی از جریان پرفشار مانده، مرحله‌ی RO را با حدود ۲ کیلووات‌ساعت انجام می‌دهند — فقط حدود دو برابر کف ترمودینامیکی [3، 6].
   </div>
 
+  <h2 id="staging">۷. طراحی یک آب‌شیرین‌کن دومرحله‌ای با ماتریس</h2>
+  <p>
+    یک مرحله با بازیافت ۵۰٪ نصف آب را دور می‌ریزد. راه معمول: ناتراوه‌ی مرحله‌ی اول را به مرحله‌ی دوم بدهیم.
+    می‌خواهیم دبی همه‌ی جریان‌ها را پیدا کنیم. این دقیقاً یک دستگاه معادلات خطی است؛ همان \(A\mathbf{x}=\mathbf{b}\) از مقاله‌ی
+    <a href="../linear-algebra-basics/">جبر خطی</a>.
+  </p>
+  <figure>
+    <svg viewBox="0 0 540 200" width="540">
+      <g font-size="13" text-anchor="middle">
+        <line x1="10" y1="70" x2="108" y2="70" style="stroke:var(--fg)" stroke-width="3" marker-end="url(#ah-m)"/>
+        <text x="55" y="58">Q_f = 100</text>
+        <rect x="110" y="40" width="120" height="60" rx="8" fill="none" style="stroke:var(--accent-4)" stroke-width="2"/>
+        <text x="170" y="75" font-weight="700">مرحله ۱</text>
+        <line x1="230" y1="60" x2="308" y2="60" style="stroke:var(--accent-2)" stroke-width="3" marker-end="url(#ah-2)"/>
+        <text x="270" y="50" style="fill:var(--accent-2)">Q_c1</text>
+        <rect x="310" y="30" width="120" height="60" rx="8" fill="none" style="stroke:var(--accent-4)" stroke-width="2"/>
+        <text x="370" y="65" font-weight="700">مرحله ۲</text>
+        <line x1="430" y1="50" x2="530" y2="50" style="stroke:var(--accent-2)" stroke-width="3" marker-end="url(#ah-2)"/>
+        <text x="485" y="40" style="fill:var(--accent-2)">Q_c2 (دورریز)</text>
+        <path d="M170 100 v60 h300" fill="none" style="stroke:var(--accent)" stroke-width="3" marker-end="url(#ah-1)"/>
+        <path d="M370 90 v70" fill="none" style="stroke:var(--accent)" stroke-width="3"/>
+        <text x="150" y="135" style="fill:var(--accent)">Q_p1</text>
+        <text x="395" y="125" style="fill:var(--accent)">Q_p2</text>
+        <text x="500" y="185" style="fill:var(--accent)">محصول</text>
+        <text x="170" y="22" class="muted" style="stroke:none">r₁ = ۵۰٪</text>
+        <text x="370" y="18" class="muted" style="stroke:none">r₂ = ۳۰٪</text>
+      </g>
+    </svg>
+    <figcaption>شکل ۱۴ — آرایش دومرحله‌ای (concentrate staging). مجهول‌ها: \(Q_{p1}, Q_{c1}, Q_{p2}, Q_{c2}\) بر حسب m³/h.</figcaption>
+  </figure>
+  <p>چهار معادله داریم: موازنه‌ی هر مرحله و تعریف بازیافت هر مرحله:</p>
+  $$\begin{aligned}
+  Q_{p1} + Q_{c1} &= 100 && \text{(موازنه‌ی مرحله ۱)}\\
+  Q_{p1} &= 0.5 \times 100 && \text{(بازیافت مرحله ۱)}\\
+  -Q_{c1} + Q_{p2} + Q_{c2} &= 0 && \text{(موازنه‌ی مرحله ۲)}\\
+  -0.3\,Q_{c1} + Q_{p2} &= 0 && \text{(بازیافت مرحله ۲)}
+  \end{aligned}$$
+  $$\underbrace{\begin{bmatrix} 1 & 1 & 0 & 0\\ 1 & 0 & 0 & 0\\ 0 & -1 & 1 & 1\\ 0 & -0.3 & 1 & 0 \end{bmatrix}}_{A}
+    \underbrace{\begin{bmatrix} Q_{p1}\\ Q_{c1}\\ Q_{p2}\\ Q_{c2}\end{bmatrix}}_{\mathbf{x}}
+    = \underbrace{\begin{bmatrix} 100\\ 50\\ 0\\ 0\end{bmatrix}}_{\mathbf{b}}
+    \quad\Rightarrow\quad
+    \mathbf{x} = \begin{bmatrix} 50\\ 50\\ 15\\ 35\end{bmatrix}$$
+  <p>
+    محصول کل \(50+15=65\ \text{m}^3/\text{h}\)، یعنی بازیافت کل ۶۵٪ به جای ۵۰٪.
+    در یک شبکه‌ی واقعی با ده‌ها مدول، بازگردش جریان و چند جزء حل‌شده، همین ساختار به ماتریس‌های صدها در صدها می‌رسد و نرم‌افزارهای شبیه‌سازی فرایند دقیقاً همین‌طور حلش می‌کنند.
+  </p>
+  <figure>
+    <div class="controls">
+      <label>Q_f <input id="st-qf" type="number" value="100" style="width:5em"></label>
+      <label>r₁ (٪) <input id="st-r1" type="range" min="10" max="60" value="50"></label>
+      <label>r₂ (٪) <input id="st-r2" type="range" min="0" max="60" value="30"></label>
+    </div>
+    <svg id="stage-svg" viewBox="0 0 520 90" width="520" style="margin-top:.8rem"></svg>
+    <figcaption>شکل ۱۵ (تعاملی) — همان ماتریس با حذف گاوسی حل می‌شود. نوار، تقسیم خوراک بین محصول و دورریز را نشان می‌دهد.<br><span id="st-info" class="ltr"></span></figcaption>
+  </figure>
+
   <!-- ============================================================ -->
-  <h2 id="gas-separation">۷. جداسازی گازها: تراوایی، انتخاب‌پذیری و نسبت فشار</h2>
+  <!-- ============================================================ -->
+  <h2 id="gas-separation">۸. جداسازی گازها: تراوایی، انتخاب‌پذیری و نسبت فشار</h2>
   <p>
     غشای جداسازی گاز هم با مکانیزم حل‌شدن–نفوذ کار می‌کند. هر گاز \(i\) یک <strong>تراوایی</strong> \(P_i\) در پلیمر دارد (حاصل‌ضرب حلالیت در ضریب نفوذ)،
     و شار آن متناسب با اختلاف <em>فشار جزئی</em> دو طرف است [5، 7]:
@@ -430,7 +638,7 @@
       <label>کسر مولی خوراک x: <input id="g-x" type="range" min="0.05" max="0.6" step="0.01" value="0.21"><span id="g-x-v"></span></label>
     </div>
     <div id="g-out" class="readout"></div>
-    <figcaption>شکل ۹ — خلوص تراوه برحسب نسبت فشار (محور لگاریتمی). خط‌چین سبز سقف ایده‌آل غشا و خط‌نقطه‌ی خاکستری ترکیب خوراک است. α را از ۵ به ۵۰ ببرید و ببینید در φ کوچک تقریباً چیزی عوض نمی‌شود.</figcaption>
+    <figcaption>شکل ۱۶ — خلوص تراوه برحسب نسبت فشار (محور لگاریتمی). خط‌چین سبز سقف ایده‌آل غشا و خط‌نقطه‌ی خاکستری ترکیب خوراک است. α را از ۵ به ۵۰ ببرید و ببینید در φ کوچک تقریباً چیزی عوض نمی‌شود.</figcaption>
   </figure>
 
   <h3>حد بالای رابسون: معامله‌ی تراوایی–انتخاب‌پذیری</h3>
@@ -449,7 +657,7 @@
   </div>
   <figure>
     <canvas id="robeson" width="640" height="330"></canvas>
-    <figcaption>شکل ۱۰ — نمودار رابسون برای O₂/N₂ (هر دو محور لگاریتمی). خط نارنجی حد بالای ۲۰۰۸، خط‌چین خاکستری حد ۱۹۹۱. نقاط، مقادیر تقریبی پلیمرهای تجاری از منابع [6، 8] هستند: سیلیکون بسیار تراوا اما کم‌انتخاب، پلی‌سولفون برعکس.</figcaption>
+    <figcaption>شکل ۱۷ — نمودار رابسون برای O₂/N₂ (هر دو محور لگاریتمی). خط نارنجی حد بالای ۲۰۰۸، خط‌چین خاکستری حد ۱۹۹۱. نقاط، مقادیر تقریبی پلیمرهای تجاری از منابع [6، 8] هستند: سیلیکون بسیار تراوا اما کم‌انتخاب، پلی‌سولفون برعکس.</figcaption>
   </figure>
   <table>
     <tr><th>کاربرد صنعتی</th><th>گاز تند (عبورکننده)</th><th>غشای نمونه</th></tr>
@@ -460,7 +668,7 @@
   </table>
 
   <!-- ============================================================ -->
-  <h2 id="dialysis">۸. یک مثال پزشکی: دیالیز</h2>
+  <h2 id="dialysis">۹. دیالیز و کاربردهای دیگر</h2>
   <p>
     دستگاه همودیالیز یک واحد غشایی با هزاران الیاف توخالی است. خون داخل الیاف و محلول دیالیز بیرون آن‌ها، <strong>در خلاف جهت هم</strong>، جریان دارند.
     اوره و کراتینین که اندازه‌ی کوچکی دارند با نفوذ (قانون فیک) به سمت دیالیزات می‌روند، اما پروتئین‌ها و سلول‌ها می‌مانند [11]:
@@ -471,14 +679,23 @@
     ریاضی همان ریاضی مبدل حرارتی است — فقط غلظت جای دما و ضریب انتقال جرم جای ضریب انتقال حرارت نشسته است.
   </p>
 
+  <h3>کاربردهای جذاب دیگر</h3>
+  <ul>
+    <li><strong>نیتروژن از هوا:</strong> غشای پلیمری اکسیژن را سریع‌تر از نیتروژن عبور می‌دهد؛ در کشتی‌ها و بسته‌بندی مواد غذایی.</li>
+    <li><strong>پیل سوختی PEM:</strong> غشای Nafion فقط پروتون را عبور می‌دهد و الکترون را مجبور می‌کند از مدار خارجی برود؛ همان جریان برق.</li>
+    <li><strong>صنایع لبنی:</strong> UF پروتئین آب پنیر را تغلیظ می‌کند و پودر پروتئین ورزشی از همین‌جا می‌آید.</li>
+    <li><strong>بازیافت پساب (water reuse):</strong> ترکیب UF، RO و UV پساب شهری را به آب با کیفیت آشامیدنی تبدیل می‌کند (مثلاً NEWater سنگاپور).</li>
+  </ul>
+
   <!-- ============================================================ -->
-  <h2 id="summary">۹. جمع‌بندی</h2>
+  <h2 id="summary">۱۰. جمع‌بندی</h2>
   <table>
     <tr><th>فرایند</th><th>نیروی محرکه</th><th>معادله‌ی اصلی</th><th>نکته‌ی طراحی</th></tr>
     <tr><td>MF / UF</td><td>فشار</td><td>\(J = \Delta P/\mu(R_m+R_c)\)</td><td>\(J\propto r^2\)؛ گرفتگی و شست‌وشوی معکوس</td></tr>
     <tr><td>RO / NF</td><td>فشار مازاد بر اسمزی</td><td>\(J_w = A(\Delta P - \Delta\pi)\)</td><td>\(\pi \approx 0.85\ \text{bar}\) به ازای هر g/L نمک؛ قطبش غلظت</td></tr>
     <tr><td>جداسازی گاز</td><td>فشار جزئی</td><td>\(J_i = \tfrac{P_i}{\ell}(p_hx_i - p_ly_i)\)</td><td>محدودیت هم‌زمان α و φ؛ حد رابسون</td></tr>
     <tr><td>دیالیز</td><td>غلظت</td><td>\(J_s = \tfrac{D}{\ell}\Delta C\)</td><td>جریان ناهمسو</td></tr>
+    <tr><td>چندمرحله‌ای</td><td>—</td><td>\(A\mathbf{x} = \mathbf{b}\) (موازنه‌ی جرم)</td><td>\(r_{\text{کل}} = 1-(1-r_1)(1-r_2)\)</td></tr>
   </table>
   <p>
     الگوی مشترک همه: <strong>شار = نیروی محرکه × تراوایی ÷ ضخامت</strong>، به‌علاوه‌ی یک «اثر سطحی» (کیک یا قطبش غلظت) که مقاومت سری اضافه می‌کند.

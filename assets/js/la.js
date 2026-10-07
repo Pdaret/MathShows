@@ -37,7 +37,29 @@
     return { data: out, w: ow, h: oh };
   }
 
-  const LA = { dot, norm, matVec2, det2, KERNELS, convolve2d };
+  // Solve A x = b (square, dense) by Gaussian elimination with partial pivoting.
+  function solve(A, b) {
+    const n = A.length, M = A.map((r, i) => [...r, b[i]]);
+    for (let c = 0; c < n; c++) {
+      let p = c;
+      for (let r = c + 1; r < n; r++) if (Math.abs(M[r][c]) > Math.abs(M[p][c])) p = r;
+      if (Math.abs(M[p][c]) < 1e-12) throw new Error("singular matrix");
+      [M[c], M[p]] = [M[p], M[c]];
+      for (let r = c + 1; r < n; r++) {
+        const f = M[r][c] / M[c][c];
+        for (let k = c; k <= n; k++) M[r][k] -= f * M[c][k];
+      }
+    }
+    const x = new Array(n);
+    for (let r = n - 1; r >= 0; r--) {
+      let s = M[r][n];
+      for (let k = r + 1; k < n; k++) s -= M[r][k] * x[k];
+      x[r] = s / M[r][r];
+    }
+    return x;
+  }
+
+  const LA = { dot, norm, matVec2, det2, KERNELS, convolve2d, solve };
   if (typeof module !== "undefined" && module.exports) module.exports = LA;
   else root.LA = LA;
 })(this);
