@@ -1,0 +1,39 @@
+/* =========================================================================
+   Layout primitives.
+   .container    centred page-width box (header, footer, lists)
+   .article-grid 3-track named grid for long-form content:
+                 [full [wide [content] wide] full]
+                 Children default to `content`; add .wide / .full to break out.
+                 Nothing can overflow the viewport: tracks shrink to 0 gutter.
+   ========================================================================= */
+.container { inline-size: min(100% - 2 * var(--gutter), var(--page)); margin-inline: auto; }
+
+.article-grid {
+  --_content: min(var(--measure), 100% - 2 * var(--gutter));
+  --_wide: minmax(0, calc((var(--wide) - var(--measure)) / 2));
+  display: grid;
+  grid-template-columns:
+    [full-start] minmax(var(--gutter), 1fr)
+    [wide-start] var(--_wide)
+    [content-start] var(--_content) [content-end]
+    var(--_wide) [wide-end]
+    minmax(var(--gutter), 1fr) [full-end];
+}
+.article-grid > * { grid-column: content; min-inline-size: 0; }
+.article-grid > .wide, .article-grid > figure, .article-grid > .katex-display { grid-column: wide; }
+.article-grid > .full { grid-column: full; }
+
+/* ---- page shell ---- */
+.page { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0 var(--space-xl); }
+
+/* Desktop: sticky TOC in a side rail next to the article (only when there is room). */
+@media (min-width: 1280px) {
+  .page.has-toc {
+    grid-template-columns: minmax(0, 1fr) 15rem;
+    inline-size: min(100% - 2 * var(--gutter), 1320px);
+    margin-inline: auto;
+  }
+  .page.has-toc .article-grid { --gutter: 0px; }
+  .page.has-toc > .toc { grid-column: 2; grid-row: 1; }
+  .page.has-toc > article { grid-column: 1; grid-row: 1; }
+}

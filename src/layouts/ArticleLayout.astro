@@ -1,0 +1,35 @@
+---
+import type { MarkdownHeading } from "astro";
+import BaseLayout from "./BaseLayout.astro";
+import Toc from "../components/Toc.astro";
+import SvgDefs from "../components/SvgDefs.astro";
+import { faDate, faNum, tagUrl, url, type Article } from "../lib/site";
+
+interface Props { article: Article; headings: MarkdownHeading[] }
+const { article, headings } = Astro.props;
+const d = article.data;
+---
+<BaseLayout title={d.title} description={d.summary}>
+  <SvgDefs />
+  <div class="page has-toc">
+    <Toc headings={headings} />
+    <article>
+      <div class="article-grid">
+        <header class="article-head">
+          <ul class="tags">{d.tags.map(t => <li><a class="tag" href={tagUrl(t)}>{t}</a></li>)}</ul>
+          <h1>{d.title}</h1>
+          <div class="article-meta">
+            <time datetime={d.date.toISOString()}>{faDate(d.date)}</time>
+            <span>زمان مطالعه {faNum(d.minutes)} دقیقه</span>
+          </div>
+        </header>
+      </div>
+      <div class="article-grid prose">
+        <slot />
+      </div>
+      <div class="article-grid">
+        <nav class="pager"><a href={url()}>← همه‌ی مقاله‌ها</a></nav>
+      </div>
+    </article>
+  </div>
+</BaseLayout>

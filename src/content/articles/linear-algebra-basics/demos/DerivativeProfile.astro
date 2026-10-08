@@ -1,0 +1,28 @@
+---
+// Fig 8: 1-D brightness profile with first and second derivatives. Static SVG, computed at build time.
+const N = 91; // odd, edge on the centre sample so finite differences stay symmetric
+const f = Array.from({ length: N }, (_, x) => 20 + 180 / (1 + Math.exp(-(x - 45) / 4)));
+const d1 = f.map((_, x) => (x && x < N - 1 ? (f[x + 1]! - f[x - 1]!) / 2 : 0));
+const d2 = f.map((_, x) => (x && x < N - 1 ? f[x + 1]! - 2 * f[x]! + f[x - 1]! : 0));
+
+function curve(data: number[], y0: number, h: number, zero: boolean) {
+  const max = Math.max(...data.map(Math.abs)) || 1, X = (x: number) => 40 + x * (460 / (N - 1));
+  const Y = (v: number) => (zero ? y0 + h / 2 - (v / max) * (h / 2) : y0 + h - (v / max) * h);
+  return { axis: zero ? y0 + h / 2 : y0 + h, points: data.map((v, x) => `${X(x)},${Y(v)}`).join(" ") };
+}
+const rows = [
+  { ...curve(f, 10, 80, false), color: "var(--accent)", label: "\u2066f(x)\u2069 روشنایی", ly: 82 },
+  { ...curve(d1, 115, 80, false), color: "var(--accent-3)", label: "\u2066f′\u2069 مشتق اول", ly: 129 },
+  { ...curve(d2, 220, 100, true), color: "var(--accent-2)", label: "\u2066f″\u2069 مشتق دوم", ly: 234 },
+];
+---
+<svg viewBox="0 0 520 330" width="520" role="img" aria-label="پروفیل روشنایی و مشتق‌های اول و دوم">
+  <line x1="270" x2="270" y1="5" y2="325" stroke-dasharray="4 4" class="muted" />
+  {rows.map(r => (
+    <g>
+      <line x1="40" x2="500" y1={r.axis} y2={r.axis} class="axis" />
+      <polyline points={r.points} fill="none" style={`stroke:${r.color}`} stroke-width="2.5" />
+      <text x="505" y={r.ly} text-anchor="end" font-size="13" style={`fill:${r.color}`}>{r.label}</text>
+    </g>
+  ))}
+</svg>

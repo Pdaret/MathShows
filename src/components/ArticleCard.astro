@@ -1,0 +1,18 @@
+---
+import type { Article } from "../lib/site";
+import { articleUrl, faDate, faNum, tagUrl } from "../lib/site";
+interface Props { article: Article }
+const { article } = Astro.props;
+const d = article.data;
+---
+<li>
+  <article class="card">
+    <h2><a href={articleUrl(article)}>{d.title}</a></h2>
+    <p>{d.summary}</p>
+    <ul class="tags">{d.tags.map(t => <li><a class="tag" href={tagUrl(t)}>{t}</a></li>)}</ul>
+    <div class="article-meta">
+      <time datetime={d.date.toISOString()}>{faDate(d.date)}</time>
+      <span>{faNum(d.minutes)} دقیقه</span>
+    </div>
+  </article>
+</li>

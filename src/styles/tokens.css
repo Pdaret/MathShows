@@ -1,0 +1,70 @@
+/* =========================================================================
+   Design tokens. Every colour, size and space in the site comes from here.
+   Fluid type/space: clamp(min @360px, …, max @1280px) — no breakpoints needed.
+   ========================================================================= */
+@font-face { font-family: "Vazirmatn"; src: url("./fonts/Vazirmatn-Regular.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "Vazirmatn"; src: url("./fonts/Vazirmatn-Bold.woff2") format("woff2"); font-weight: 700; font-display: swap; }
+/* IRANSans if the reader has it installed (full/PostScript names, not file names). */
+@font-face { font-family: "IRANSansLocal"; src: local("IRANSansWeb Medium"), local("IRANSansWeb-Medium"), local("IRANSansWeb"), local("IRANSans"); font-weight: 400; }
+@font-face { font-family: "IRANSansLocal"; src: local("IRANSansWeb Bold"), local("IRANSansWeb-Bold"), local("IRANSans Bold"); font-weight: 700; }
+
+:root {
+  color-scheme: light dark;
+
+  /* ---- type ---- */
+  --font: "IRANSansLocal", "Vazirmatn", Tahoma, sans-serif;
+  /* IRANSans lacks U+22C5/U+2212 and has an oversized U+00B7: numbers & LTR readouts use mono. */
+  --mono: ui-monospace, "Cascadia Code", Consolas, "DejaVu Sans Mono", monospace;
+  --step--1: clamp(0.83rem, 0.8rem + 0.15vw, 0.9rem);
+  --step-0: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+  --step-1: clamp(1.15rem, 1.05rem + 0.45vw, 1.35rem);
+  --step-2: clamp(1.35rem, 1.15rem + 0.9vw, 1.75rem);
+  --step-3: clamp(1.6rem, 1.25rem + 1.6vw, 2.4rem);
+  --leading: 1.95;
+
+  /* ---- space ---- */
+  --space-2xs: 0.25rem;
+  --space-xs: 0.5rem;
+  --space-s: 0.75rem;
+  --space-m: clamp(1rem, 0.9rem + 0.5vw, 1.25rem);
+  --space-l: clamp(1.5rem, 1.3rem + 1vw, 2rem);
+  --space-xl: clamp(2.25rem, 1.8rem + 2vw, 3.5rem);
+  --gutter: clamp(1rem, 0.5rem + 2.5vw, 2rem);
+
+  /* ---- layout ---- */
+  --measure: 68ch;       /* body text column */
+  --wide: 960px;         /* figures that need more room */
+  --page: 1200px;        /* header/footer/home grid */
+  --radius: 10px;
+  --radius-s: 6px;
+
+  /* ---- colour (light) ---- */
+  --bg: #fcfcfa;
+  --surface: #ffffff;
+  --surface-2: #f3f2ee;
+  --fg: #1b1f27;
+  --muted: #5d6573;
+  --border: #e4e2dc;
+  --accent: #2f6fde;
+  --accent-2: #d9512f;
+  --accent-3: #1a8f60;
+  --accent-4: #8048cc;
+  --focus: #2f6fde;
+  --shadow: 0 1px 2px rgb(0 0 0 / 0.04), 0 4px 16px rgb(0 0 0 / 0.04);
+}
+
+/* Dark: system preference unless the user picked a theme explicitly (data-theme on <html>). */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111318; --surface: #181b22; --surface-2: #20242d; --fg: #e5e7ec; --muted: #9aa2b2;
+    --border: #2a2f3a; --accent: #74a4ff; --accent-2: #ff8b6b; --accent-3: #4fd19b; --accent-4: #b892ff;
+    --focus: #74a4ff; --shadow: none;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #111318; --surface: #181b22; --surface-2: #20242d; --fg: #e5e7ec; --muted: #9aa2b2;
+  --border: #2a2f3a; --accent: #74a4ff; --accent-2: #ff8b6b; --accent-3: #4fd19b; --accent-4: #b892ff;
+  --focus: #74a4ff; --shadow: none;
+}
+:root[data-theme="light"] { color-scheme: light; }

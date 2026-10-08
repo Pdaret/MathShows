@@ -1,0 +1,28 @@
+/* =========================================================================
+   Interactive figure UI: controls row, readouts, stepper, side-by-side panels.
+   Islands render inside a <figure>, which is a size container: components
+   adapt to the figure's width (@container), not the viewport's.
+   ========================================================================= */
+.controls {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
+  gap: var(--space-xs) var(--space-m); margin-block-start: var(--space-s);
+  font-size: var(--step--1);
+}
+.ctl { display: inline-flex; align-items: center; gap: var(--space-xs); line-height: 1.4; }
+.ctl output { min-inline-size: 3.5ch; text-align: end; }
+.readout { text-align: center; font-size: var(--step--1); margin-block-start: var(--space-s); line-height: 1.9; text-wrap: balance; }
+.readout.ltr { font-size: var(--step--1); }
+
+.panels { display: flex; flex-wrap: wrap; gap: var(--space-m); justify-content: center; }
+.panels > * { text-align: center; font-size: var(--step--1); color: var(--muted); line-height: 1.6; }
+.panels > * > :is(svg, canvas) { margin-inline: auto; margin-block-end: var(--space-2xs); }
+.panels.grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); }
+
+.stepper-stage { display: flex; justify-content: center; }
+
+/* Stack controls vertically on narrow figures so every slider stays usable. */
+@container (max-width: 420px) {
+  .controls { flex-direction: column; align-items: stretch; }
+  .ctl { justify-content: space-between; }
+  .ctl input[type="range"] { flex: 1; }
+}

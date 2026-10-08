@@ -1,0 +1,65 @@
+/* =========================================================================
+   Long-form article typography (.prose). Vertical rhythm via owl selector.
+   ========================================================================= */
+.prose > * + * { margin-block-start: var(--space-m); }
+.prose > h2 { font-size: var(--step-2); margin-block-start: var(--space-xl); padding-block-start: var(--space-m); border-block-start: 1px solid var(--border); }
+.prose > h3 { font-size: var(--step-1); margin-block-start: var(--space-l); }
+.prose > h2 + *, .prose > h3 + * { margin-block-start: var(--space-s); }
+.prose p, .prose li { text-align: justify; text-justify: inter-word; hyphens: auto; }
+.prose ul, .prose ol { padding-inline-start: 1.4em; }
+.prose li + li { margin-block-start: var(--space-2xs); }
+.prose li::marker { color: var(--muted); }
+.prose .lead { font-size: var(--step-1); color: var(--muted); line-height: 1.85; }
+.prose strong { font-weight: 700; }
+.prose hr { border: 0; border-block-start: 1px solid var(--border); margin-block: var(--space-xl); }
+
+/* heading anchors */
+.prose :is(h2, h3)[id] { position: relative; }
+
+/* ---- math ---- */
+.katex { font-size: 1.08em; }
+.katex-display { position: relative; overflow-x: auto; overflow-y: hidden; padding-block: var(--space-xs); margin-block: var(--space-m); scrollbar-width: thin; }
+/* KaTeX's screen-reader MathML is absolutely positioned; keep it from widening the page. */
+.katex { position: relative; }
+.katex-display > .katex { white-space: nowrap; }
+
+/* ---- code ---- */
+code { font-family: var(--mono); font-size: 0.88em; background: var(--surface-2); padding: 0.1em 0.35em; border-radius: 4px; }
+pre { font-size: var(--step--1); line-height: 1.65; padding: var(--space-m); border-radius: var(--radius); overflow-x: auto; text-align: left; border: 1px solid var(--border); }
+pre code { background: none; padding: 0; font-size: inherit; }
+/* Shiki dual theme: switch on our theme, not only the OS one */
+.astro-code, .astro-code span { background-color: var(--surface-2) !important; }
+:root[data-theme="dark"] .astro-code, :root[data-theme="dark"] .astro-code span { color: var(--shiki-dark) !important; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .astro-code, :root:not([data-theme="light"]) .astro-code span { color: var(--shiki-dark) !important; }
+}
+
+/* ---- tables: shrink-wrap, centred, scroll inside their own box on narrow screens ---- */
+.prose table {
+  display: block; overflow-x: auto; inline-size: max-content; max-inline-size: 100%; margin-inline: auto;
+  border-collapse: collapse; font-size: var(--step--1); line-height: 1.7;
+}
+.prose th, .prose td { border: 1px solid var(--border); padding: var(--space-xs) var(--space-s); text-align: center; }
+.prose th { background: var(--surface-2); font-weight: 700; }
+.prose table.num-grid { direction: ltr; }
+.prose .num-grid td { font-family: var(--mono); min-inline-size: 2.6rem; }
+
+/* ---- figures (static and interactive share the same card) ---- */
+.prose figure {
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: var(--space-m); margin-block: var(--space-l); box-shadow: var(--shadow);
+  container-type: inline-size;
+}
+.prose figure :is(svg, canvas) { margin-inline: auto; }
+figcaption { color: var(--muted); font-size: var(--step--1); line-height: 1.85; margin-block-start: var(--space-s); text-align: center; text-wrap: pretty; }
+svg text { font-family: var(--font); fill: var(--fg); }
+svg .muted { fill: var(--muted); stroke: var(--muted); }
+svg .axis { stroke: var(--muted); stroke-width: 1.5; }
+svg .math { font-family: var(--mono); }
+canvas.pixel { image-rendering: pixelated; border: 1px solid var(--border); }
+.c1 { color: var(--accent); } .c2 { color: var(--accent-2); } .c3 { color: var(--accent-3); } .c4 { color: var(--accent-4); }
+
+/* ---- references ---- */
+.prose .refs { direction: ltr; }
+.prose .refs li { text-align: start; font-size: var(--step--1); line-height: 1.7; overflow-wrap: anywhere; }
+.prose .meta { color: var(--muted); font-size: var(--step--1); }

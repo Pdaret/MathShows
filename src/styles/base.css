@@ -1,0 +1,56 @@
+/* =========================================================================
+   Base: reset + elements. Logical properties only (inline/block), so the same
+   rules work for RTL and LTR content.
+   ========================================================================= */
+*, *::before, *::after { box-sizing: border-box; }
+* { margin: 0; }
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; scroll-padding-block-start: 5rem; }
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+body {
+  min-block-size: 100dvh;
+  overflow-x: clip;
+  display: flex; flex-direction: column;
+  background: var(--bg); color: var(--fg);
+  font-family: var(--font); font-size: var(--step-0); line-height: var(--leading);
+  overflow-wrap: break-word;
+}
+main { flex: 1; }
+img, svg, canvas, video { display: block; max-inline-size: 100%; block-size: auto; }
+input, button, select, textarea { font: inherit; color: inherit; }
+h1, h2, h3, h4 { line-height: 1.45; text-wrap: balance; }
+p { text-wrap: pretty; }
+a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 0.25em; }
+a:not(:hover) { text-decoration-color: color-mix(in srgb, currentColor 35%, transparent); }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; border-radius: 2px; }
+::selection { background: color-mix(in srgb, var(--accent) 25%, transparent); }
+
+.visually-hidden {
+  position: absolute !important; inline-size: 1px; block-size: 1px; overflow: hidden;
+  clip-path: inset(50%); white-space: nowrap;
+}
+.skip-link { position: absolute; inset-inline-start: var(--space-s); inset-block-start: -10rem; z-index: 100;
+  background: var(--surface); padding: var(--space-xs) var(--space-s); border-radius: var(--radius-s); }
+.skip-link:focus { inset-block-start: var(--space-s); }
+
+/* LTR islands inside RTL text */
+.katex, .ltr, code, pre, .num { direction: ltr; unicode-bidi: isolate; }
+.ltr, .num { font-family: var(--mono); font-size: 0.92em; }
+svg { direction: ltr; }
+
+/* ---- buttons & form controls (used by interactive figures) ---- */
+button, .btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2xs);
+  min-block-size: 2.25rem; padding: 0 var(--space-m);
+  font-size: var(--step--1); line-height: 1;
+  background: var(--accent); color: #fff; border: 1px solid var(--accent);
+  border-radius: var(--radius-s); cursor: pointer; touch-action: manipulation;
+}
+button.secondary, .btn.secondary { background: transparent; color: var(--accent); }
+button[aria-pressed="true"] { background: var(--accent); color: #fff; }
+button:disabled { opacity: 0.4; cursor: not-allowed; }
+input[type="range"] { accent-color: var(--accent); inline-size: clamp(6rem, 30vw, 9rem); }
+input[type="number"], select {
+  min-block-size: 2.25rem; padding: 0 var(--space-xs); inline-size: 5.5em;
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-s);
+}
+input[type="checkbox"] { accent-color: var(--accent); inline-size: 1.1rem; block-size: 1.1rem; }

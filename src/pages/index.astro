@@ -1,0 +1,18 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import ArticleCard from "../components/ArticleCard.astro";
+import { SITE, getArticles } from "../lib/site";
+const articles = await getArticles();
+---
+<BaseLayout>
+  <div class="container">
+    <section class="hero">
+      <h1>{SITE.title}</h1>
+      <p>{SITE.description} هر مفهوم با فرمول، شکل، مثال عددی و دموی تعاملی.</p>
+    </section>
+    <h2 class="section-title">تازه‌ترین مقاله‌ها</h2>
+    <ul class="card-list">
+      {articles.map(a => <ArticleCard article={a} />)}
+    </ul>
+  </div>
+</BaseLayout>

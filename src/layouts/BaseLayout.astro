@@ -1,0 +1,61 @@
+---
+import "katex/dist/katex.min.css";
+import "../styles/global.css";
+import { SITE, url } from "../lib/site";
+import ThemeToggle from "../components/ThemeToggle.astro";
+
+interface Props {
+  title?: string;
+  description?: string;
+  /** Extra class on <main>. */
+  mainClass?: string;
+}
+const { title, description = SITE.description, mainClass } = Astro.props;
+const fullTitle = title ? `${title} — ${SITE.title}` : `${SITE.title} — ${SITE.tagline}`;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const path = Astro.url.pathname;
+---
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{fullTitle}</title>
+  <meta name="description" content={description} />
+  <link rel="canonical" href={canonical} />
+  <link rel="alternate" type="application/rss+xml" title={SITE.title} href={url("rss.xml")} />
+  <link rel="sitemap" href={url("sitemap-index.xml")} />
+  <meta property="og:title" content={fullTitle} />
+  <meta property="og:description" content={description} />
+  <meta property="og:locale" content="fa_IR" />
+  <meta name="theme-color" content="#fcfcfa" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#111318" media="(prefers-color-scheme: dark)" />
+  <!-- Apply saved theme before first paint (no flash). -->
+  <script is:inline>
+    try { const t = localStorage.getItem("theme"); if (t) document.documentElement.dataset.theme = t; } catch {}
+  </script>
+</head>
+<body>
+  <a class="skip-link" href="#main">پرش به محتوا</a>
+  <header class="site-header">
+    <div class="container">
+      <a class="brand" href={url()}>{SITE.title}</a>
+      <nav class="site-nav" aria-label="اصلی">
+        <a href={url()} aria-current={path === url() ? "page" : undefined}>مقاله‌ها</a>
+        <a href={url("tags/")} aria-current={path.startsWith(url("tags/")) ? "page" : undefined}>برچسب‌ها</a>
+        <a href={url("rss.xml")}>RSS</a>
+        <ThemeToggle />
+      </nav>
+    </div>
+  </header>
+  <main id="main" class={mainClass}>
+    <slot />
+  </main>
+  <footer class="site-footer">
+    <div class="container">
+      <span>{SITE.title} — {SITE.tagline}</span>
+      <a href="https://github.com/Pdaret/MathShows">GitHub</a>
+    </div>
+  </footer>
+</body>
+</html>

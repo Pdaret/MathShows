@@ -1,0 +1,19 @@
+<button type="button" class="icon-btn" id="theme-toggle" aria-label="تغییر تم روشن/تیره">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+    <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" />
+  </svg>
+</button>
+<script>
+  const root = document.documentElement;
+  const isDark = () =>
+    root.dataset.theme ? root.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+  const btn = document.getElementById("theme-toggle")!;
+  const sync = () => btn.setAttribute("aria-pressed", String(isDark()));
+  sync();
+  btn.addEventListener("click", () => {
+    const next = isDark() ? "light" : "dark";
+    root.dataset.theme = next;
+    try { localStorage.setItem("theme", next); } catch {}
+    sync();
+  });
+</script>

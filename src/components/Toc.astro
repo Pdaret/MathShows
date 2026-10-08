@@ -1,0 +1,32 @@
+---
+import type { MarkdownHeading } from "astro";
+interface Props { headings: MarkdownHeading[] }
+const items = Astro.props.headings.filter(h => h.depth === 2);
+---
+{items.length > 0 && (
+  <nav class="toc" aria-label="فهرست مطالب">
+    <details open>
+      <summary class="toc-title">فهرست مطالب</summary>
+      <ol>
+        {items.map(h => <li class={`depth-${h.depth}`}><a href={`#${h.slug}`}>{h.text}</a></li>)}
+      </ol>
+    </details>
+  </nav>
+)}
+<script>
+  // Collapse on small screens; highlight the section being read.
+  const toc = document.querySelector<HTMLElement>(".toc");
+  if (toc) {
+    const details = toc.querySelector("details")!;
+    if (!matchMedia("(min-width: 1280px)").matches) details.open = false;
+    const links = new Map([...toc.querySelectorAll<HTMLAnchorElement>("a")].map(a => [decodeURIComponent(a.hash.slice(1)), a]));
+    const io = new IntersectionObserver(entries => {
+      for (const e of entries) {
+        if (!e.isIntersecting) continue;
+        links.forEach(a => a.removeAttribute("aria-current"));
+        links.get(e.target.id)?.setAttribute("aria-current", "true");
+      }
+    }, { rootMargin: "0px 0px -70% 0px" });
+    links.forEach((_, id) => { const h = document.getElementById(id); if (h) io.observe(h); });
+  }
+</script>

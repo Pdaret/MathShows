@@ -1,0 +1,15 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getArticles, tagUrl, faNum } from "../../lib/site";
+const counts = new Map<string, number>();
+for (const a of await getArticles()) for (const t of a.data.tags) counts.set(t, (counts.get(t) ?? 0) + 1);
+const tags = [...counts].sort((a, b) => b[1] - a[1]);
+---
+<BaseLayout title="برچسب‌ها">
+  <div class="container">
+    <section class="hero"><h1>برچسب‌ها</h1></section>
+    <ul class="tags">
+      {tags.map(([t, n]) => <li><a class="tag" href={tagUrl(t)}>{t} ({faNum(n)})</a></li>)}
+    </ul>
+  </div>
+</BaseLayout>

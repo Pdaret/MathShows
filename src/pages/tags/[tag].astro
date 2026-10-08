@@ -1,0 +1,20 @@
+---
+import type { GetStaticPaths } from "astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import ArticleCard from "../../components/ArticleCard.astro";
+import { getArticles, type Article } from "../../lib/site";
+
+export const getStaticPaths = (async () => {
+  const articles = await getArticles();
+  const tags = [...new Set(articles.flatMap(a => a.data.tags))];
+  return tags.map(tag => ({ params: { tag }, props: { tag, articles: articles.filter(a => a.data.tags.includes(tag)) } }));
+}) satisfies GetStaticPaths;
+
+const { tag, articles } = Astro.props as { tag: string; articles: Article[] };
+---
+<BaseLayout title={`برچسب: ${tag}`}>
+  <div class="container">
+    <section class="hero"><h1>#{tag}</h1></section>
+    <ul class="card-list">{articles.map(a => <ArticleCard article={a} />)}</ul>
+  </div>
+</BaseLayout>
