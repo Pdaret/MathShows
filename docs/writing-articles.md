@@ -12,9 +12,16 @@ summary: "یک یا دو جمله؛ در کارت و RSS و متای صفحه ا
 date: "2026-10-08"
 tags: ["جبر خطی", "هوش مصنوعی"]
 minutes: 15
+subjects: ["math", "cs"]            # موضوع؛ کلیدها در src/lib/taxonomy.ts
+formats: ["interactive", "animation"] # نوع تجربه؛ کلیدها در src/lib/taxonomy.ts
+level: beginner                     # beginner | intermediate | advanced
+outcomes:                           # ۱ تا ۴ مورد: «بعد از خواندن می‌توانی…»
+  - "ضرب ماتریس را هندسی ببینی"
 draft: true        # اختیاری
 ---
 ```
+
+موضوع یا نوع جدید لازم شد؟ یک خط به `SUBJECTS` یا `FORMATS` در `src/lib/taxonomy.ts` اضافه کنید.
 
 فیلد اشتباه یا جاافتاده باعث خطای build می‌شود (اسکیمای `src/content.config.ts`). ثبت در جای دیگری لازم نیست؛ لیست، برچسب‌ها، RSS و sitemap خودکار به‌روز می‌شوند.
 

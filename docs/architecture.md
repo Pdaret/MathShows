@@ -19,7 +19,8 @@
 ```
 astro.config.mjs            base=/MathShows، MDX، Preact، KaTeX، Shiki
 src/
-  content.config.ts         اسکیمای مقاله (title, summary, date, tags, minutes, draft, updated)
+  content.config.ts         اسکیمای مقاله (title, summary, date, tags, minutes, subjects, formats, level, outcomes, draft, updated)
+  lib/taxonomy.ts           فهرست موضوع‌ها، نوع‌های تجربه و سطح‌ها
   content/articles/<slug>/
     index.mdx               متن مقاله
     demos/*.tsx | *.astro   دموهای مخصوص همین مقاله
