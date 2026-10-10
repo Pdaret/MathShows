@@ -42,6 +42,7 @@ const path = Astro.url.pathname;
       <a class="brand" href={url()}>{SITE.title}</a>
       <nav class="site-nav" aria-label="اصلی">
         <a href={url()} aria-current={path === url() ? "page" : undefined}>مقاله‌ها</a>
+        <a href={url("explore/")} aria-current={path.startsWith(url("explore/")) ? "page" : undefined}>کاوش</a>
         <a href={url("tags/")} aria-current={path.startsWith(url("tags/")) ? "page" : undefined}>برچسب‌ها</a>
         <a href={url("rss.xml")}>RSS</a>
         <ThemeToggle />

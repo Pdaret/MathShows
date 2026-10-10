@@ -27,6 +27,7 @@ src/
     demos/*.tsx | *.astro   دموهای مخصوص همین مقاله
   lib/                      منطق خالص و تست‌پذیر، بدون DOM
     site.ts                 SITE، getArticles، ساخت URL، تاریخ فارسی
+    filter.ts               منطق خالص فیلتر و (de)serialize کوئری‌استرینگ
     la.ts, membrane.ts      ریاضیات دامنه
     frames.ts               قرارداد الگوریتم گام‌به‌گام
   components/
@@ -37,6 +38,7 @@ src/
     ArticleLayout.astro     سرتیتر مقاله + TOC + گرید متن
   pages/
     index.astro             لیست مقاله‌ها
+    explore.astro           فیلتر موضوع × نوع × سطح + جستجو (اسکریپت کلاینتی)
     articles/[slug].astro   یک صفحه برای هر مقاله
     tags/index.astro, tags/[tag].astro
     rss.xml.ts, 404.astro

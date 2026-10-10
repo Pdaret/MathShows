@@ -1,0 +1,91 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import ArticleCard from "../components/ArticleCard.astro";
+import { getArticles, faNum } from "../lib/site";
+import { SUBJECTS, FORMATS, LEVELS } from "../lib/taxonomy";
+const articles = await getArticles();
+const groups = [
+  { key: "subject", label: "موضوع", opts: SUBJECTS },
+  { key: "format", label: "نوع تجربه", opts: FORMATS },
+  { key: "level", label: "سطح", opts: LEVELS },
+] as const;
+// Only offer options that at least one article uses (no dead filters).
+const used = {
+  subject: new Set<string>(articles.flatMap(a => a.data.subjects)),
+  format: new Set<string>(articles.flatMap(a => a.data.formats)),
+  level: new Set<string>(articles.map(a => a.data.level)),
+};
+---
+<BaseLayout title="کاوش" description="مقاله‌ها را بر اساس موضوع، نوع تجربه و سطح فیلتر کنید.">
+  <div class="container">
+    <section class="hero">
+      <h1>کاوش</h1>
+      <p>بر اساس موضوع، نوع تجربه یا سطح پیدا کن.</p>
+    </section>
+
+    <form class="filters" id="filters" role="search" onsubmit="return false">
+      <input type="search" name="q" placeholder="جستجو در عنوان و خلاصه…" aria-label="جستجو" autocomplete="off" />
+      {groups.map(g => (
+        <fieldset data-group={g.key}>
+          <legend>{g.label}</legend>
+          {Object.entries(g.opts).filter(([k]) => used[g.key].has(k)).map(([k, label]) => (
+            <label class="fchip"><input type="checkbox" value={k} /><span>{label}</span></label>
+          ))}
+        </fieldset>
+      ))}
+      <div class="filters-foot">
+        <span id="count" aria-live="polite">{faNum(articles.length)} مقاله</span>
+        <button type="reset" class="fclear" id="clear" hidden>پاک‌کردن فیلترها</button>
+      </div>
+    </form>
+
+    <ul class="card-list" id="results">
+      {articles.map(a => (
+        <ArticleCard article={a}
+          data-subjects={a.data.subjects.join(" ")} data-formats={a.data.formats.join(" ")}
+          data-level={a.data.level} data-text={`${a.data.title} ${a.data.summary} ${a.data.tags.join(" ")}`} />
+      ))}
+    </ul>
+    <p id="empty" class="empty" hidden>مقاله‌ای با این فیلترها پیدا نشد.</p>
+  </div>
+</BaseLayout>
+
+<script>
+  import { matches, parseSel, serializeSel, type Sel } from "../lib/filter";
+
+  const faNum = (n: number) => n.toLocaleString("fa-IR");
+  const form = document.getElementById("filters") as HTMLFormElement;
+  const q = form.elements.namedItem("q") as HTMLInputElement;
+  const rows = [...document.querySelectorAll<HTMLElement>("#results > li")].map(el => ({
+    el,
+    it: {
+      subjects: (el.dataset.subjects ?? "").split(" "), formats: (el.dataset.formats ?? "").split(" "),
+      level: el.dataset.level ?? "", text: el.dataset.text ?? "",
+    },
+  }));
+  const boxes = (g: string) => [...form.querySelectorAll<HTMLInputElement>(`fieldset[data-group=${g}] input`)];
+  const checked = (g: string) => boxes(g).filter(b => b.checked).map(b => b.value);
+
+  const read = (): Sel => ({ subjects: checked("subject"), formats: checked("format"), levels: checked("level"), q: q.value });
+  const write = (s: Sel) => {
+    for (const [g, v] of [["subject", s.subjects], ["format", s.formats], ["level", s.levels]] as const)
+      boxes(g).forEach(b => (b.checked = v.includes(b.value)));
+    q.value = s.q;
+  };
+
+  function apply(push: boolean) {
+    const s = read();
+    let n = 0;
+    for (const r of rows) { const ok = matches(r.it, s); r.el.hidden = !ok; if (ok) n++; }
+    (document.getElementById("count") as HTMLElement).textContent = `${faNum(n)} مقاله`;
+    (document.getElementById("empty") as HTMLElement).hidden = n > 0;
+    const qs = serializeSel(s);
+    (document.getElementById("clear") as HTMLElement).hidden = !qs;
+    if (push) history.replaceState(null, "", location.pathname + qs);
+  }
+
+  form.addEventListener("input", () => apply(true));
+  form.addEventListener("reset", () => setTimeout(() => apply(true)));
+  write(parseSel(location.search));
+  apply(false);
+</script>
