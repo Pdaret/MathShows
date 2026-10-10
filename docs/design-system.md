@@ -37,6 +37,14 @@
 
 `.card-list`: `grid auto-fill minmax(min(100%, 22rem), 1fr)` — تعداد ستون خودکار، بدون breakpoint.
 
+### کارت و سربرگ مقاله
+
+- `Chips.astro`: چیپ موضوع (رنگ accent) + چیپ نوع (دورخط). از `subjects`/`formats` frontmatter.
+- `LevelBadge.astro`: سه نقطه‌ی پر/خالی + برچسب سطح.
+- `ArticleCard.astro`: چیپ‌ها ← عنوان ← خلاصه ← «بعد از خواندن می‌توانی» (دو مورد اول `outcomes`) ← پایین کارت: سطح · زمان · تعداد دمو.
+- `.at-a-glance` در سربرگ مقاله: سطح، زمان، تعداد دمو و فهرست کامل `outcomes`.
+- تعداد دمو خودکار است: شمارش `client:*` در بدنه‌ی MDX (`demoCount` در `lib/site.ts`)؛ فیلد دستی لازم نیست.
+
 ## ریسپانسیو
 
 - تقریباً هیچ breakpoint ثابتی نداریم؛ تایپ و فاصله سیال‌اند. تنها breakpoint صفحه 1280px برای TOC است.

@@ -23,3 +23,6 @@ export const tagUrl = (tag: string) => url(`tags/${encodeURIComponent(tag)}/`);
 export const faDate = (d: Date) =>
   d.toLocaleDateString("fa-IR", { year: "numeric", month: "long", day: "numeric" });
 export const faNum = (n: number) => n.toLocaleString("fa-IR");
+
+/** Interactive demos = hydrated islands in the MDX body (`client:` directives). */
+export const demoCount = (a: Article) => (a.body?.match(/\bclient:(?:visible|load|idle|only)/g) ?? []).length;

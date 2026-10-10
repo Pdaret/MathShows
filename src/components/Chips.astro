@@ -1,0 +1,10 @@
+---
+import { SUBJECTS, FORMATS } from "../lib/taxonomy";
+import type { Article } from "../lib/site";
+interface Props { article: Article }
+const d = Astro.props.article.data;
+---
+<ul class="chips">
+  {d.subjects.map(s => <li class="chip chip-subject">{SUBJECTS[s]}</li>)}
+  {d.formats.map(f => <li class="chip chip-format">{FORMATS[f]}</li>)}
+</ul>

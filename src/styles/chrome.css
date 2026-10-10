@@ -98,3 +98,32 @@ a.tag:hover { color: var(--fg); }
 .callout .katex-display { margin-block: var(--space-xs); }
 
 .pager { display: flex; justify-content: space-between; gap: var(--space-m); flex-wrap: wrap; margin-block-start: var(--space-xl); }
+
+/* ---- experience layers: chips, level, at-a-glance, card extras ---- */
+.chips { display: flex; flex-wrap: wrap; gap: var(--space-2xs); padding: 0; list-style: none; }
+.chip { font-size: 0.78rem; line-height: 1.9; border-radius: 999px; padding: 0 var(--space-s); }
+.chip-subject { background: color-mix(in srgb, var(--accent) 14%, transparent); color: var(--accent); font-weight: 700; }
+.chip-format { border: 1px solid var(--border); color: var(--muted); }
+
+.level { display: inline-flex; align-items: center; gap: var(--space-2xs); }
+.level-dots { display: inline-flex; gap: 3px; }
+.level-dots i { inline-size: 0.5rem; block-size: 0.5rem; border-radius: 50%; background: var(--border); }
+.level-dots i.on { background: var(--accent-3); }
+
+.learn strong, .card-learn strong { display: block; font-size: var(--step--1); color: var(--fg); margin-block-end: var(--space-2xs); }
+.learn ul, .card-learn ul { margin: 0; padding-inline-start: 1.2em; color: var(--muted); font-size: var(--step--1); line-height: 1.85; }
+
+.card-learn { border-block-start: 1px dashed var(--border); padding-block-start: var(--space-xs); }
+.card-foot { margin-block-start: auto; padding-block-start: var(--space-xs); }
+.card-foot > * + *::before { content: "·"; margin-inline-end: var(--space-s); }
+.card-foot > .level::before { content: none; }
+
+.at-a-glance {
+  margin-block: var(--space-m); padding: var(--space-m) var(--space-l);
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  display: grid; gap: var(--space-m);
+}
+.at-a-glance dl { display: flex; flex-wrap: wrap; gap: var(--space-s) var(--space-xl); margin: 0; }
+.at-a-glance dt { color: var(--muted); font-size: 0.78rem; }
+.at-a-glance dd { margin: 0; font-weight: 700; }
+.article-head > .tags { margin-block-start: var(--space-s); }

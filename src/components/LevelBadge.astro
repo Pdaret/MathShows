@@ -1,0 +1,7 @@
+---
+import { LEVELS, LEVEL_KEYS, type Level } from "../lib/taxonomy";
+interface Props { level: Level }
+const { level } = Astro.props;
+const n = LEVEL_KEYS.indexOf(level) + 1;
+---
+<span class="level" title="سطح"><span class="level-dots" aria-hidden="true">{LEVEL_KEYS.map((_, i) => <i class:list={{ on: i < n }} />)}</span>{LEVELS[level]}</span>

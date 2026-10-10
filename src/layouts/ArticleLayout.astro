@@ -3,11 +3,14 @@ import type { MarkdownHeading } from "astro";
 import BaseLayout from "./BaseLayout.astro";
 import Toc from "../components/Toc.astro";
 import SvgDefs from "../components/SvgDefs.astro";
-import { faDate, faNum, tagUrl, url, type Article } from "../lib/site";
+import Chips from "../components/Chips.astro";
+import LevelBadge from "../components/LevelBadge.astro";
+import { demoCount, faDate, faNum, tagUrl, url, type Article } from "../lib/site";
 
 interface Props { article: Article; headings: MarkdownHeading[] }
 const { article, headings } = Astro.props;
 const d = article.data;
+const demos = demoCount(article);
 ---
 <BaseLayout title={d.title} description={d.summary}>
   <SvgDefs />
@@ -16,12 +19,23 @@ const d = article.data;
     <article>
       <div class="article-grid">
         <header class="article-head">
-          <ul class="tags">{d.tags.map(t => <li><a class="tag" href={tagUrl(t)}>{t}</a></li>)}</ul>
+          <Chips article={article} />
           <h1>{d.title}</h1>
           <div class="article-meta">
             <time datetime={d.date.toISOString()}>{faDate(d.date)}</time>
-            <span>زمان مطالعه {faNum(d.minutes)} دقیقه</span>
           </div>
+          <aside class="at-a-glance" aria-label="خلاصه‌ی مقاله">
+            <dl>
+              <div><dt>سطح</dt><dd><LevelBadge level={d.level} /></dd></div>
+              <div><dt>زمان مطالعه</dt><dd>{faNum(d.minutes)} دقیقه</dd></div>
+              {demos > 0 && <div><dt>دموی تعاملی</dt><dd>{faNum(demos)}</dd></div>}
+            </dl>
+            <div class="learn">
+              <strong>بعد از خواندن می‌توانی</strong>
+              <ul>{d.outcomes.map(o => <li>{o}</li>)}</ul>
+            </div>
+          </aside>
+          <ul class="tags">{d.tags.map(t => <li><a class="tag" href={tagUrl(t)}>{t}</a></li>)}</ul>
         </header>
       </div>
       <div class="article-grid prose">

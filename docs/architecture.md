@@ -20,6 +20,7 @@
 astro.config.mjs            base=/MathShows، MDX، Preact، KaTeX، Shiki
 src/
   content.config.ts         اسکیمای مقاله (title, summary, date, tags, minutes, subjects, formats, level, outcomes, draft, updated)
+  components/Chips, LevelBadge   چیپ موضوع/نوع و نشان سطح (کارت و سربرگ)
   lib/taxonomy.ts           فهرست موضوع‌ها، نوع‌های تجربه و سطح‌ها
   content/articles/<slug>/
     index.mdx               متن مقاله
