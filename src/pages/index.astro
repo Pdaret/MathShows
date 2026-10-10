@@ -1,15 +1,63 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import ArticleCard from "../components/ArticleCard.astro";
-import { SITE, getArticles } from "../lib/site";
+import HeroDemo from "../components/HeroDemo";
+import { SITE, getArticles, url, faNum } from "../lib/site";
+import { SUBJECTS, FORMATS } from "../lib/taxonomy";
+
 const articles = await getArticles();
+const count = (pick: (a: (typeof articles)[number]) => string[]) => {
+  const m = new Map<string, number>();
+  for (const a of articles) for (const k of pick(a)) m.set(k, (m.get(k) ?? 0) + 1);
+  return m;
+};
+const subjects = count(a => a.data.subjects);
+const formats = count(a => a.data.formats);
+const first = articles[0];
 ---
 <BaseLayout>
   <div class="container">
-    <section class="hero">
-      <h1>{SITE.title}</h1>
-      <p>{SITE.description} هر مفهوم با فرمول، شکل، مثال عددی و دموی تعاملی.</p>
+    <section class="hero hero-split">
+      <div class="hero-text">
+        <p class="eyebrow">{SITE.tagline}</p>
+        <h1>ریاضی را ببین،<br />دست بزن، بفهم.</h1>
+        <p class="lead">هر مفهوم با شکل متحرک، فرمول و مثال عددی توضیح داده می‌شود و خودت می‌توانی عددها را عوض کنی و نتیجه را همان لحظه ببینی. فارسی، بدون نصب و بدون ثبت‌نام.</p>
+        <div class="cta">
+          {first && <a class="btn" href={url(`articles/${first.id}/`)}>شروع با جدیدترین مقاله</a>}
+          <a class="btn btn-ghost" href={url("explore/")}>کاوش بر اساس موضوع</a>
+        </div>
+        <ul class="hero-facts">
+          <li><strong>{faNum(articles.length)}</strong> مقاله</li>
+          <li><strong>{faNum(subjects.size)}</strong> موضوع</li>
+          <li><strong>{faNum(formats.size)}</strong> نوع تجربه</li>
+        </ul>
+      </div>
+      <figure class="hero-fig">
+        <HeroDemo client:idle />
+        <figcaption>یک ماتریس ۲×۲ صفحه را می‌چرخاند و می‌کِشد. دو لغزنده را حرکت بده.</figcaption>
+      </figure>
     </section>
+
+    <h2 class="section-title">از کجا شروع کنم؟</h2>
+    <div class="browse">
+      <div>
+        <h3>بر اساس موضوع</h3>
+        <ul class="chips">
+          {[...subjects].map(([k, n]) => (
+            <li><a class="chip chip-subject" href={url(`explore/?subject=${k}`)}>{SUBJECTS[k as keyof typeof SUBJECTS]} ({faNum(n)})</a></li>
+          ))}
+        </ul>
+      </div>
+      <div>
+        <h3>بر اساس نوع تجربه</h3>
+        <ul class="chips">
+          {[...formats].map(([k, n]) => (
+            <li><a class="chip chip-format" href={url(`explore/?format=${k}`)}>{FORMATS[k as keyof typeof FORMATS]} ({faNum(n)})</a></li>
+          ))}
+        </ul>
+      </div>
+    </div>
+
     <h2 class="section-title">تازه‌ترین مقاله‌ها</h2>
     <ul class="card-list">
       {articles.map(a => <ArticleCard article={a} />)}

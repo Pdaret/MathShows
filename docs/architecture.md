@@ -20,6 +20,7 @@
 astro.config.mjs            base=/MathShows، MDX، Preact، KaTeX، Shiki
 src/
   content.config.ts         اسکیمای مقاله (title, summary, date, tags, minutes, subjects, formats, level, outcomes, draft, updated)
+  components/HeroDemo.tsx    دموی تعاملی صفحه‌ی اصلی
   components/Chips, LevelBadge   چیپ موضوع/نوع و نشان سطح (کارت و سربرگ)
   lib/taxonomy.ts           فهرست موضوع‌ها، نوع‌های تجربه و سطح‌ها
   content/articles/<slug>/
@@ -37,7 +38,7 @@ src/
     BaseLayout.astro        <html>، هدر، فوتر، متا، تم
     ArticleLayout.astro     سرتیتر مقاله + TOC + گرید متن
   pages/
-    index.astro             لیست مقاله‌ها
+    index.astro             Hero + دموی زنده + مسیرهای کاوش + لیست مقاله‌ها
     explore.astro           فیلتر موضوع × نوع × سطح + جستجو (اسکریپت کلاینتی)
     articles/[slug].astro   یک صفحه برای هر مقاله
     tags/index.astro, tags/[tag].astro
