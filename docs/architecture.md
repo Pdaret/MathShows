@@ -39,7 +39,7 @@ src/
     BaseLayout.astro        <html>، هدر و پنل بومی ظاهر (رنگ/تم/RSS)، فوتر، متا
     ArticleLayout.astro     سرتیتر مقاله + TOC + گرید متن
   pages/
-    index.astro             Hero + دموی زنده + مسیرهای کاوش + لیست مقاله‌ها
+    index.astro             Hero + دموی SVG مقایسهٔ تبدیل + مسیرهای کاوش + لیست مقاله‌ها
     explore.astro           فیلتر موضوع × نوع × سطح + جستجو (اسکریپت کلاینتی)
     articles/[slug].astro   یک صفحه برای هر مقاله
     tags/index.astro, tags/[tag].astro

@@ -53,7 +53,10 @@ const path = Astro.url.pathname;
         <a href={url("tags/")} aria-current={path.startsWith(url("tags/")) ? "page" : undefined}>برچسب‌ها</a>
       </nav>
       <details class="appearance">
-        <summary>ظاهر <span aria-hidden="true">＋</span></summary>
+        <summary aria-label="تنظیمات ظاهر" title="تنظیمات ظاهر">
+          <svg class="appearance-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="12" r="8" /><path d="M12 4a8 8 0 0 1 0 16Z" fill="currentColor" stroke="none" /></svg>
+          <span class="appearance-label">ظاهر</span>
+        </summary>
         <div class="appearance-panel">
           <PaletteSelect />
           <div class="appearance-mode"><span>روشن / تیره</span><ThemeToggle /></div>
