@@ -1,0 +1,19 @@
+<label class="palette-select">
+  <span>رنگ</span>
+  <select id="palette-select" aria-label="پالت رنگ سایت">
+    <option value="paper">کاغذ و جوهر</option>
+    <option value="red">مشکی و قرمز</option>
+    <option value="amber">سرمه‌ای و کهربایی</option>
+    <option value="slate">آبی خاکستری</option>
+    <option value="crimson">قرمز صنعتی</option>
+    <option value="wine">زرشکی و نقره‌ای</option>
+  </select>
+</label>
+<script>
+  const select = document.getElementById("palette-select") as HTMLSelectElement;
+  select.value = document.documentElement.dataset.palette || "paper";
+  select.addEventListener("change", () => {
+    document.documentElement.dataset.palette = select.value;
+    try { localStorage.setItem("palette", select.value); } catch {}
+  });
+</script>

@@ -3,6 +3,7 @@ import "katex/dist/katex.min.css";
 import "../styles/global.css";
 import { SITE, url } from "../lib/site";
 import ThemeToggle from "../components/ThemeToggle.astro";
+import PaletteSelect from "../components/PaletteSelect.astro";
 
 interface Props {
   title?: string;
@@ -33,7 +34,12 @@ const path = Astro.url.pathname;
   <meta name="theme-color" content="#111318" media="(prefers-color-scheme: dark)" />
   <!-- Apply saved theme before first paint (no flash). -->
   <script is:inline>
-    try { const t = localStorage.getItem("theme"); if (t) document.documentElement.dataset.theme = t; } catch {}
+    try {
+      const t = localStorage.getItem("theme");
+      if (t === "light" || t === "dark") document.documentElement.dataset.theme = t;
+      const p = localStorage.getItem("palette");
+      if (["paper", "red", "amber", "slate", "crimson", "wine"].includes(p)) document.documentElement.dataset.palette = p;
+    } catch {}
   </script>
 </head>
 <body>
@@ -46,6 +52,7 @@ const path = Astro.url.pathname;
         <a href={url("explore/")} aria-current={path.startsWith(url("explore/")) ? "page" : undefined}>کاوش</a>
         <a href={url("tags/")} aria-current={path.startsWith(url("tags/")) ? "page" : undefined}>برچسب‌ها</a>
         <a href={url("rss.xml")}>RSS</a>
+        <PaletteSelect />
         <ThemeToggle />
       </nav>
     </div>

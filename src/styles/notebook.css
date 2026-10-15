@@ -1,0 +1,49 @@
+/* Notebook surfaces; palette tokens live in palettes.css. */
+:root { --page: 1080px; --radius: 1px; --radius-s: 1px; --leading: 2; --shadow: none; }
+.site-header { position: static; background: var(--bg); backdrop-filter: none; -webkit-backdrop-filter: none; border: 0; }
+.site-header .container { padding-block: var(--space-m); border-block-end: 2px solid var(--fg); }
+.brand { font-family: var(--mono); letter-spacing: 0; }
+.site-nav { flex-wrap: wrap; }
+.site-nav a { min-block-size: 44px; display: inline-flex; align-items: center; color: var(--fg); }
+.site-nav a::before { content: "["; margin-inline-end: 0.3em; }
+.site-nav a::after { content: "]"; margin-inline-start: 0.3em; }
+.site-nav a:hover, .site-nav a[aria-current="page"] { color: var(--accent); text-decoration: underline; }
+.icon-btn { inline-size: 44px; min-block-size: 44px; border-radius: 1px; }
+button, .btn, select, input[type="number"] { min-block-size: 44px; }
+button, .btn, button[aria-pressed="true"] { color: var(--on-accent); }
+button.secondary, .btn.secondary { color: var(--accent); }
+.palette-select { display: flex; align-items: center; gap: var(--space-xs); font-size: var(--step--1); }
+.palette-select select { inline-size: auto; max-inline-size: 100%; min-inline-size: 0; }
+.hero-split { gap: var(--space-xl); }
+.hero-split h1 { line-height: 1.65; }
+.eyebrow { color: var(--muted); font-weight: 400; }
+.cta .btn { min-block-size: 44px; padding-inline: 0; background: none; color: var(--accent); border: 0; text-decoration: underline; font-weight: 400; }
+.hero-fig { border-color: var(--fg); padding: 0; box-shadow: 5px 5px 0 var(--frame-shadow); }
+.hero-demo { padding: var(--space-m); }
+.hero-fig figcaption { padding: 0 var(--space-m) var(--space-m); font-size: var(--step--1); }
+.lab-title { display: flex; justify-content: space-between; flex-wrap: wrap; gap: var(--space-xs); padding: var(--space-xs) var(--space-m); background: var(--surface-2); border-block-end: 1px solid var(--fg); font-size: var(--step--1); }
+.lab-title .ltr { color: var(--muted); }
+:root[data-palette="amber"] .lab-title { border-block-start: 3px solid #fca311; }
+.section-title { color: var(--fg); font-weight: 700; padding-block-end: var(--space-xs); border-block-end: 1px solid var(--fg); }
+.card-list { display: block; }
+.card-list > li + li { border-block-start: 1px solid var(--border); }
+.card { background: transparent; border: 0; padding: var(--space-l) 0; gap: var(--space-xs); }
+.card h2 a::after, .card h3 a::after { content: none; }
+.card h2 a:hover { color: var(--accent); text-decoration: underline; }
+.card p { max-inline-size: 78ch; }
+.card-foot { margin-block-start: 0; }
+.chip, .tag, .fchip span { border-radius: 1px; }
+.chip-subject { background: transparent; color: var(--muted); font-weight: 400; }
+.chip-format { border: 0; padding-inline-start: 0; }
+.browse { gap: var(--space-m); }
+.browse .chip { text-decoration: underline; }
+.fchip input:checked + span { color: var(--on-accent); }
+.filters input[type="search"] { min-block-size: 44px; }
+.article-head .at-a-glance { background: transparent; border-inline: 0; padding-inline: 0; border-block: 1px dashed var(--border); }
+.prose figure { background: transparent; border: 0; padding-inline: 0; box-shadow: none; }
+.prose figure:has(astro-island) { background: var(--surface); border: 1px solid var(--fg); padding: var(--space-m); box-shadow: 4px 4px 0 var(--frame-shadow); }
+.prose figure:has(astro-island)::before { content: "آزمایش تعاملی"; display: block; background: var(--surface-2); border-block-end: 1px solid var(--fg); margin: calc(-1 * var(--space-m)) calc(-1 * var(--space-m)) var(--space-m); padding: var(--space-xs) var(--space-m); font-size: var(--step--1); }
+.callout { background: transparent; border: 0; border-block: 1px dashed var(--border); padding-inline: 0; }
+.site-footer { border: 0; }
+.site-footer .container { border-block-start: 2px solid var(--fg); }
+@media (max-width: 600px) { .site-header .container { align-items: start; } .site-nav { margin-inline-start: 0; inline-size: 100%; gap: var(--space-xs) var(--space-s); } }

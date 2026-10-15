@@ -20,19 +20,16 @@ const first = articles[0];
     <section class="hero hero-split">
       <div class="hero-text">
         <p class="eyebrow">{SITE.tagline}</p>
-        <h1>ریاضی را ببین،<br />دست بزن، بفهم.</h1>
-        <p class="lead">هر مفهوم با شکل متحرک، فرمول و مثال عددی توضیح داده می‌شود و خودت می‌توانی عددها را عوض کنی و نتیجه را همان لحظه ببینی. فارسی، بدون نصب و بدون ثبت‌نام.</p>
+        <h1>کمی ریاضی،<br />کمی دست‌کاری،<br />یک لحظهٔ «آهان!»</h1>
+        <p class="lead">دربارهٔ چیزهایی که پشت صفحه اتفاق می‌افتند؛ با شکل، مثال عددی و آزمایش. عددها را عوض کن و ببین چه اتفاقی می‌افتد.</p>
         <div class="cta">
           {first && <a class="btn" href={url(`articles/${first.id}/`)}>شروع با جدیدترین مقاله</a>}
           <a class="btn btn-ghost" href={url("explore/")}>کاوش بر اساس موضوع</a>
         </div>
-        <ul class="hero-facts">
-          <li><strong>{faNum(articles.length)}</strong> مقاله</li>
-          <li><strong>{faNum(subjects.size)}</strong> موضوع</li>
-          <li><strong>{faNum(formats.size)}</strong> نوع تجربه</li>
-        </ul>
+
       </div>
       <figure class="hero-fig">
+        <div class="lab-title">آزمایش / چرخش و برش صفحه <span class="ltr">matrix.lab</span></div>
         <HeroDemo client:idle />
         <figcaption>یک ماتریس ۲×۲ صفحه را می‌چرخاند و می‌کِشد. دو لغزنده را حرکت بده.</figcaption>
       </figure>

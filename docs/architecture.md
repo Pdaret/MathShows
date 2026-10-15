@@ -33,7 +33,7 @@ src/
     timekeeping.ts          محاسبهٔ offset و delay از چهار زمان NTP (تست: timekeeping.test.ts)
     frames.ts               قرارداد الگوریتم گام‌به‌گام
   components/
-    *.astro                 کامپوننت‌های استاتیک (Callout, Toc, ArticleCard, SvgDefs, ThemeToggle)
+    *.astro                 کامپوننت‌های استاتیک (Callout, Toc, ArticleCard, SvgDefs, ThemeToggle, PaletteSelect)
     interactive/            قطعات مشترک Preact: Stepper, CanvasPlot, Slider/Controls/Readout, hooks
   layouts/
     BaseLayout.astro        <html>، هدر، فوتر، متا، تم

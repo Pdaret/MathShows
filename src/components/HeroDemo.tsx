@@ -5,22 +5,12 @@ import { Slider } from "./interactive/controls";
 
 const W = 320, H = 320, S = 34;
 
-/** Home-page hero: drag two sliders, watch the plane and the matrix change. Idles with a gentle sweep until touched. */
+/** Drag two sliders to change the plane and matrix; no automatic motion. */
 export default function HeroDemo() {
   const cv = useRef<HTMLCanvasElement>(null);
   const [angle, setAngle] = useState(25);
   const [shear, setShear] = useState(0.6);
-  const [touched, setTouched] = useState(false);
   const c = useCssVars(["border", "accent", "accent-2", "accent-3", "accent-4"] as const);
-
-  // Idle sweep: skipped for reduced-motion users and stops at first interaction.
-  useEffect(() => {
-    if (touched || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    let raf = 0;
-    const tick = (t: number) => { setAngle(Math.round(40 * Math.sin(t / 1400))); raf = requestAnimationFrame(tick); };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-  }, [touched]);
 
   const r = (angle * Math.PI) / 180;
   const M: Mat2 = [
@@ -55,8 +45,8 @@ export default function HeroDemo() {
         A = [[{f(M[0][0])}, {f(M[0][1])}], [{f(M[1][0])}, {f(M[1][1])}]] &nbsp; det = {f(det2(M))}
       </p>
       <div class="controls">
-        <Slider label="دوران" value={angle} min={-90} max={90} unit="°" onInput={v => { setTouched(true); setAngle(v); }} />
-        <Slider label="برش" value={shear} min={-1.5} max={1.5} step={0.05} display={f(shear)} onInput={v => { setTouched(true); setShear(v); }} />
+        <Slider label="دوران" value={angle} min={-90} max={90} unit="°" onInput={v => { setAngle(v); }} />
+        <Slider label="برش" value={shear} min={-1.5} max={1.5} step={0.05} display={f(shear)} onInput={v => { setShear(v); }} />
       </div>
     </div>
   );

@@ -12,7 +12,7 @@ export function useCssVars<K extends string>(names: readonly K[]): Record<K, str
   useEffect(() => {
     const update = () => setVars(read());
     const mo = new MutationObserver(update);
-    mo.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+    mo.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme", "data-palette"] });
     const mq = matchMedia("(prefers-color-scheme: dark)");
     mq.addEventListener("change", update);
     return () => { mo.disconnect(); mq.removeEventListener("change", update); };
