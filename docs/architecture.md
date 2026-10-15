@@ -30,6 +30,7 @@ src/
     site.ts                 SITE، getArticles، ساخت URL، تاریخ فارسی
     filter.ts               منطق خالص فیلتر و (de)serialize کوئری‌استرینگ
     la.ts, membrane.ts      ریاضیات دامنه
+    timekeeping.ts          محاسبهٔ offset و delay از چهار زمان NTP (تست: timekeeping.test.ts)
     frames.ts               قرارداد الگوریتم گام‌به‌گام
   components/
     *.astro                 کامپوننت‌های استاتیک (Callout, Toc, ArticleCard, SvgDefs, ThemeToggle)
