@@ -5,14 +5,24 @@ import { useEffect, useRef, useState } from "preact/hooks";
 export function useCssVars<K extends string>(names: readonly K[]): Record<K, string> {
   const read = () => {
     const cs = getComputedStyle(document.documentElement);
-    return Object.fromEntries(names.map(n => [n, cs.getPropertyValue(`--${n}`).trim()])) as Record<K, string>;
+    const probe = document.createElement("span");
+    probe.hidden = true;
+    document.documentElement.append(probe);
+    try {
+      return Object.fromEntries(names.map(n => {
+        const value = cs.getPropertyValue(`--${n}`).trim();
+        if (!CSS.supports("color", value)) return [n, value];
+        probe.style.color = value;
+        return [n, getComputedStyle(probe).color];
+      })) as Record<K, string>;
+    } finally { probe.remove(); }
   };
   const [vars, setVars] = useState<Record<K, string>>(() =>
     typeof document === "undefined" ? ({} as Record<K, string>) : read());
   useEffect(() => {
     const update = () => setVars(read());
     const mo = new MutationObserver(update);
-    mo.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme", "data-palette"] });
+    mo.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme", "data-palette", "style"] });
     const mq = matchMedia("(prefers-color-scheme: dark)");
     mq.addEventListener("change", update);
     return () => { mo.disconnect(); mq.removeEventListener("change", update); };

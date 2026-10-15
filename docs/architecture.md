@@ -30,6 +30,7 @@ src/
     site.ts                 SITE، getArticles، ساخت URL، تاریخ فارسی
     filter.ts               منطق خالص فیلتر و (de)serialize کوئری‌استرینگ
     la.ts, membrane.ts      ریاضیات دامنه
+    random-theme.ts         اعتبارسنجی hue ذخیره‌شده و تولید hue تازه
     timekeeping.ts          محاسبهٔ offset و delay از چهار زمان NTP (تست: timekeeping.test.ts)
     frames.ts               قرارداد الگوریتم گام‌به‌گام
   components/

@@ -37,6 +37,11 @@ const path = Astro.url.pathname;
     try {
       const t = localStorage.getItem("theme");
       if (t === "light" || t === "dark") document.documentElement.dataset.theme = t;
+      const hue = localStorage.getItem("random-hue");
+      if (hue !== null && /^\d{1,3}$/.test(hue) && Number(hue) < 360) {
+        document.documentElement.style.setProperty("--random-hue", hue);
+        if (localStorage.getItem("palette") === "random") document.documentElement.dataset.palette = "random";
+      }
       const p = localStorage.getItem("palette");
       if (["paper", "red", "amber", "slate", "crimson", "wine"].includes(p)) document.documentElement.dataset.palette = p;
     } catch {}

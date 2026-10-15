@@ -7,11 +7,33 @@
     <option value="slate">آبی خاکستری</option>
     <option value="crimson">قرمز صنعتی</option>
     <option value="wine">زرشکی و نقره‌ای</option>
+    <option value="random" id="random-option" hidden>تم تصادفی من</option>
   </select>
 </label>
+<div class="random-theme">
+  <button type="button" class="secondary" id="random-theme">ساخت تم تصادفی</button>
+  <p id="random-status" aria-live="polite">رنگ تازه، هماهنگ با حالت روشن و تیره.</p>
+</div>
 <script>
+  import { parseHue, randomHue } from "../lib/random-theme";
+  const root = document.documentElement;
   const select = document.getElementById("palette-select") as HTMLSelectElement;
-  select.value = document.documentElement.dataset.palette || "paper";
+  const option = document.getElementById("random-option") as HTMLOptionElement;
+  let hue = parseHue(root.style.getPropertyValue("--random-hue"));
+  option.hidden = hue === null;
+  select.value = root.dataset.palette || "paper";
+  document.getElementById("random-theme")!.addEventListener("click", () => {
+    hue = randomHue(hue);
+    root.style.setProperty("--random-hue", String(hue));
+    root.dataset.palette = "random";
+    option.hidden = false;
+    select.value = "random";
+    let saved = true;
+    try { localStorage.setItem("random-hue", String(hue)); localStorage.setItem("palette", "random"); } catch { saved = false; }
+    document.getElementById("random-status")!.textContent = saved
+      ? "تم تازه ذخیره شد؛ دوباره بزن تا رنگ عوض شود."
+      : "تم تازه اعمال شد؛ ذخیره‌سازی مرورگر در دسترس نیست.";
+  });
   select.addEventListener("change", () => {
     document.documentElement.dataset.palette = select.value;
     try { localStorage.setItem("palette", select.value); } catch {}

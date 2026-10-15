@@ -1,0 +1,33 @@
+/* Fixed lightness/saturation keep contrast predictable; only hue is randomized. */
+:root[data-palette="random"] {
+  --bg: hsl(var(--random-hue) 16% 96%);
+  --surface: hsl(var(--random-hue) 16% 99%);
+  --surface-2: hsl(var(--random-hue) 16% 90%);
+  --fg: #202020; --muted: #505050; --border: #888888;
+  --accent: hsl(var(--random-hue) 65% 25%); --focus: var(--accent);
+  --on-accent: #ffffff; --frame-shadow: #202020;
+  --accent-2: #a13e2d; --accent-3: #346b45; --accent-4: #7051a0;
+}
+@media (prefers-color-scheme: dark) {
+  :root[data-palette="random"]:not([data-theme="light"]) {
+    --bg: hsl(var(--random-hue) 16% 8%);
+    --surface: hsl(var(--random-hue) 16% 12%);
+    --surface-2: hsl(var(--random-hue) 16% 17%);
+    --fg: #f2f2f2; --muted: #bcbcbc; --border: #888888;
+    --accent: hsl(var(--random-hue) 65% 78%); --on-accent: #151515;
+    --frame-shadow: #080a09;
+    --accent-2: #ff9a76; --accent-3: #96cda5; --accent-4: #bba7e6;
+  }
+}
+:root[data-palette="random"][data-theme="dark"] {
+  --bg: hsl(var(--random-hue) 16% 8%);
+  --surface: hsl(var(--random-hue) 16% 12%);
+  --surface-2: hsl(var(--random-hue) 16% 17%);
+  --fg: #f2f2f2; --muted: #bcbcbc; --border: #888888;
+  --accent: hsl(var(--random-hue) 65% 78%); --on-accent: #151515;
+  --frame-shadow: #080a09;
+  --accent-2: #ff9a76; --accent-3: #96cda5; --accent-4: #bba7e6;
+}
+.random-theme { margin-block-start: var(--space-m); padding-block-start: var(--space-s); border-block-start: 1px dashed var(--border); }
+.random-theme button { inline-size: 100%; }
+.random-theme p { font-size: 0.75rem; color: var(--muted); margin-block-start: var(--space-xs); }
