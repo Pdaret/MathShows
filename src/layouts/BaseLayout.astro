@@ -51,10 +51,15 @@ const path = Astro.url.pathname;
         <a href={url()} aria-current={path === url() ? "page" : undefined}>مقاله‌ها</a>
         <a href={url("explore/")} aria-current={path.startsWith(url("explore/")) ? "page" : undefined}>کاوش</a>
         <a href={url("tags/")} aria-current={path.startsWith(url("tags/")) ? "page" : undefined}>برچسب‌ها</a>
-        <a href={url("rss.xml")}>RSS</a>
-        <PaletteSelect />
-        <ThemeToggle />
       </nav>
+      <details class="appearance">
+        <summary>ظاهر <span aria-hidden="true">＋</span></summary>
+        <div class="appearance-panel">
+          <PaletteSelect />
+          <div class="appearance-mode"><span>روشن / تیره</span><ThemeToggle /></div>
+          <a href={url("rss.xml")} class="feed-link">دریافت نوشته‌ها با RSS</a>
+        </div>
+      </details>
     </div>
   </header>
   <main id="main" class={mainClass}>

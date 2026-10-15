@@ -36,7 +36,7 @@ src/
     *.astro                 کامپوننت‌های استاتیک (Callout, Toc, ArticleCard, SvgDefs, ThemeToggle, PaletteSelect)
     interactive/            قطعات مشترک Preact: Stepper, CanvasPlot, Slider/Controls/Readout, hooks
   layouts/
-    BaseLayout.astro        <html>، هدر، فوتر، متا، تم
+    BaseLayout.astro        <html>، هدر و پنل بومی ظاهر (رنگ/تم/RSS)، فوتر، متا
     ArticleLayout.astro     سرتیتر مقاله + TOC + گرید متن
   pages/
     index.astro             Hero + دموی زنده + مسیرهای کاوش + لیست مقاله‌ها
