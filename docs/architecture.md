@@ -32,6 +32,7 @@ src/
     la.ts, membrane.ts      ریاضیات دامنه
     random-theme.ts         اعتبارسنجی hue ذخیره‌شده و تولید hue تازه
     timekeeping.ts          محاسبهٔ offset و delay از چهار زمان NTP (تست: timekeeping.test.ts)
+    transformer.ts          توجه تک‌سر با softmax پایدار و ماسک علّی؛ هندسهٔ patchهای ViT
     frames.ts               قرارداد الگوریتم گام‌به‌گام
   components/
     *.astro                 کامپوننت‌های استاتیک (Callout, Toc, ArticleCard, SvgDefs, ThemeToggle, PaletteSelect)
