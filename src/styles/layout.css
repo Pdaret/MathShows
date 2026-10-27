@@ -30,7 +30,7 @@
 @media (min-width: 1280px) {
   .page.has-toc {
     grid-template-columns: minmax(0, 1fr) 15rem;
-    inline-size: min(100% - 2 * var(--gutter), 1320px);
+    inline-size: min(100% - 2 * var(--gutter), var(--page));
     margin-inline: auto;
   }
   .page.has-toc .article-grid { --gutter: 0px; }
