@@ -33,9 +33,10 @@ src/
     random-theme.ts         اعتبارسنجی hue ذخیره‌شده و تولید hue تازه
     timekeeping.ts          محاسبهٔ offset و delay از چهار زمان NTP (تست: timekeeping.test.ts)
     transformer.ts          توجه تک‌سر با softmax پایدار و ماسک علّی؛ هندسهٔ patchهای ViT
+    proof.ts                موتور تاکتیک آموزشی منطق گزاره‌ها (شبیه goal state در Lean) و دومینوی استقرا (تست: proof.test.ts)
     frames.ts               قرارداد الگوریتم گام‌به‌گام
   components/
-    *.astro                 کامپوننت‌های استاتیک (Callout, Toc, ArticleCard, SvgDefs, ThemeToggle, PaletteSelect)
+    *.astro                 کامپوننت‌های استاتیک (Callout, LeanBlock, Toc, ArticleCard, SvgDefs, ThemeToggle, PaletteSelect)
     interactive/            قطعات مشترک Preact: Stepper, CanvasPlot, Slider/Controls/Readout, hooks
   layouts/
     BaseLayout.astro        <html>، هدر و پنل بومی ظاهر (رنگ/تم/RSS)، فوتر، متا

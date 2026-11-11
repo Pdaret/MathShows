@@ -1,0 +1,16 @@
+---
+import { Code } from "astro:components";
+interface Props { code: string; caption?: string }
+const { code, caption } = Astro.props;
+const src = code.replace(/^\n+|\s+$/g, "");
+// Lean 4 Web editor reads the program from the URL fragment.
+const href = `https://live.lean-lang.org/#code=${encodeURIComponent(src)}`;
+---
+<div class="lean-block">
+  <Code code={src} lang="lean4" themes={{ light: "github-light", dark: "github-dark" }} />
+  <p class="lean-run"><a href={href} target="_blank" rel="noopener">اجرا در Lean (live.lean-lang.org) ↗</a>{caption && <span> — {caption}</span>}</p>
+</div>
+<style>
+  .lean-block { margin-block: var(--space-m); }
+  .lean-run { font-size: var(--step--1); margin-block: var(--space-2xs) 0; color: var(--muted, inherit); }
+</style>

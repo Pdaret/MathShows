@@ -1,0 +1,320 @@
+---
+title: "Lean و اثبات صوری؛ وقتی کامپیوتر اثبات را چک می‌کند"
+summary: "از قضیه به‌عنوان نوع و اثبات به‌عنوان برنامه تا تاکتیک‌ها و استقرا در Lean 4؛ با کدهای اجراشده، شبیه‌ساز تعاملی goal و دومینوی استقرا."
+date: "2026-11-11"
+tags: ["Lean", "اثبات صوری", "منطق", "استقرا", "نظریه نوع"]
+minutes: 28
+subjects: ["math", "cs"]
+formats: ["interactive", "animation", "intuitive"]
+level: intermediate
+outcomes:
+  - "رابطهٔ گزاره، نوع و اثبات را در Lean توضیح بدهی"
+  - "یک اثبات کوتاه را با تاکتیک‌های intro، constructor، cases و exact بنویسی"
+  - "با استقرا یک خاصیت روی اعداد طبیعی را در Lean ثابت کنی"
+  - "بدانی kernel چه چیزی را تضمین می‌کند و چه چیزی را نه"
+---
+
+import { TacticDemo, DominoDemo } from './demos/LeanDemos';
+import LeanBlock from '../../../components/LeanBlock.astro';
+
+<p class="lead">اثبات ریاضی را معمولاً آدم‌ها می‌خوانند و قبول می‌کنند. در Lean اثبات یک برنامه است و یک کامپایلر کوچک به نام <strong>kernel</strong> آن را چک می‌کند. اگر کامپایل شد، هر گام از آکسیوم‌ها مشروع بوده است. مقاله از دیدگاه برنامه‌نویسی شروع می‌کند: نوع، تابع، مقدار. بعد نشان می‌دهد همان ابزارها چطور «قضیه» و «اثبات» می‌شوند.</p>
+
+همهٔ کدهای Lean این مقاله با Lean 4.35.0 کامپایل شده‌اند (خروجی‌های نشان‌داده‌شده خروجی واقعی‌اند). زیر هر بلوک پیوند «اجرا در Lean» همان کد را در ویرایشگر آنلاین باز می‌کند. دموهای تعاملی، برخلاف بلوک‌ها، **شبیه‌سازهای آموزشی** هستند و Lean اجرا نمی‌کنند. منبع زبان و معماری: [۱]، کتاب‌های آموزشی: [۲] و [۳].
+
+## ۱. چرا اثبات صوری؟
+
+اثبات‌های کاغذی هم‌چنان خطا دارند. یک «واضح است که» در میانهٔ استدلال می‌تواند یک حالت مرزی را پنهان کند. در نرم‌افزار هم همین را می‌شناسیم: برنامه‌ای که «به نظر درست می‌آید» تا تست یا کامپایلر چیزی نگفته است. اثبات صوری همان نقش کامپایلر را برای استدلال بازی می‌کند.
+
+<figure>
+  <svg viewBox="0 0 600 170" width="600" role="img" aria-label="کد Lean وارد elaborator می‌شود، اثبات کامل ساخته می‌شود و kernel آن را چک می‌کند؛ نتیجه پذیرش یا خطا است">
+    <g fill="var(--surface-2)" stroke="var(--border)">
+      <rect x="10" y="45" width="130" height="70" rx="6" />
+      <rect x="190" y="45" width="130" height="70" rx="6" />
+      <rect x="370" y="45" width="100" height="70" rx="6" />
+      <rect x="505" y="20" width="85" height="45" rx="6" />
+      <rect x="505" y="95" width="85" height="45" rx="6" />
+    </g>
+    <g text-anchor="middle" font-size="15">
+      <text x="75" y="76">متن Lean</text><text x="75" y="99">تاکتیک‌ها</text>
+      <text x="255" y="76">elaborator</text><text x="255" y="99">ساخت اثبات کامل</text>
+      <text x="420" y="85">kernel</text>
+      <text x="547" y="48">پذیرفته</text><text x="547" y="123">خطا</text>
+    </g>
+    <path d="M140 80H185M320 80H365M470 70L500 48M470 90L500 112" fill="none" stroke="var(--accent)" stroke-width="2" marker-end="url(#ah-1)" />
+  </svg>
+  <figcaption>شکل ۱ — تاکتیک‌ها فقط راهنمای ساخت اثبات‌اند. تنها kernel، که کوچک و قابل بازبینی است، تعیین می‌کند اثبات پذیرفته شود.</figcaption>
+</figure>
+
+نکتهٔ مهم معماری: خود تاکتیک‌ها اشتباه کنند هم مهم نیست؛ هر چه بسازند باید از kernel رد شود. بنابراین اعتماد به کل سیستم به اعتماد به همان هستهٔ کوچک تقلیل می‌یابد.
+
+## ۲. گزاره‌ها نوع‌اند، اثبات‌ها مقدار
+
+برای برنامه‌نویس، `n : Nat` یعنی «`n` مقداری از نوع `Nat` است». Lean همین را به منطق می‌برد (تناظر Curry–Howard [۴]):
+
+| منطق | برنامه‌نویسی | در Lean |
+|---|---|---|
+| گزاره $P$ | نوع | `P : Prop` |
+| اثبات $P$ | مقداری از آن نوع | `hp : P` |
+| $P \to Q$ | تابع از $P$ به $Q$ | `P → Q` |
+| $P \wedge Q$ | زوج | `P ∧ Q`، ساخته با `⟨hp, hq⟩` |
+| $P \vee Q$ | اتحاد برچسب‌دار | `P ∨ Q` |
+
+<figure>
+  <svg viewBox="0 0 560 190" width="560" role="img" aria-label="سمت چپ جملهٔ ریاضی و اثبات، سمت راست نوع و مقدار؛ پیکان‌های تناظر بین آن‌ها">
+    <g fill="var(--surface-2)" stroke="var(--border)">
+      <rect x="10" y="30" width="190" height="130" rx="6" />
+      <rect x="360" y="30" width="190" height="130" rx="6" />
+    </g>
+    <g text-anchor="middle" font-size="15">
+      <text x="105" y="22">ریاضی</text><text x="455" y="22">برنامه</text>
+      <text x="105" y="70">گزاره P</text><text x="105" y="105">اثبات P</text><text x="105" y="140">P ⇒ Q</text>
+      <text x="455" y="70" class="math">P : Prop</text><text x="455" y="105" class="math">hp : P</text><text x="455" y="140" class="math">P → Q</text>
+    </g>
+    <path d="M205 66H355M205 101H355M205 136H355" fill="none" stroke="var(--accent)" stroke-width="2" marker-end="url(#ah-1)" />
+    <g text-anchor="middle" font-size="13"><text x="280" y="58">نوع</text><text x="280" y="93">مقدار</text><text x="280" y="128">تابع</text></g>
+  </svg>
+  <figcaption>شکل ۲ — «اثبات کردن P» یعنی ساختن مقداری از نوع P. چک کردن اثبات یعنی type checking.</figcaption>
+</figure>
+
+نخستین اثبات‌ها:
+
+<LeanBlock code={`theorem two_add_two : 2 + 2 = 4 := rfl
+
+theorem imp_const (P Q : Prop) : P → Q → P :=
+  fun hp _ => hp
+
+example (P Q : Prop) (hp : P) (hq : Q) : P ∧ Q := ⟨hp, hq⟩`} />
+
+- `rfl` می‌گوید دو طرف با محاسبه یکی می‌شوند. `2 + 2` به `4` کاهش می‌یابد.
+- `imp_const` یک تابع است: دو ورودی می‌گیرد و اولی را برمی‌گرداند. همین اثبات «از P نتیجه می‌شود که Q ⇒ P» است.
+- `example` قضیهٔ بی‌نام است؛ مناسب آزمایش.
+
+<Callout type="note" title="اثبات‌ها فقط درباره‌ی Prop اند">
+
+یک گزاره از نوع `Prop` است و مهم نیست **کدام** اثبات داده شده؛ فقط وجودش مهم است. بر خلاف `Nat` که `3` و `4` دو مقدار متفاوت‌اند، همهٔ اثبات‌های یک گزاره برابر شمرده می‌شوند (proof irrelevance).
+
+</Callout>
+
+## ۳. تاکتیک‌ها و حالت هدف
+
+نوشتن مستقیم لامبدا برای اثبات‌های بزرگ طاقت‌فرساست. با `by` وارد حالت **تاکتیک** می‌شویم: هر دستور، هدف فعلی را به هدف‌های ساده‌تر می‌شکند. Lean در هر لحظه **goal state** را نشان می‌دهد: فرض‌ها بالای `⊢` و حکمی که باید ثابت شود زیر آن.
+
+<LeanBlock code={`theorem and_swap (P Q : Prop) : P ∧ Q → Q ∧ P := by
+  intro h1
+  obtain ⟨h2, h3⟩ := h1
+  constructor
+  · exact h3
+  · exact h2`} />
+
+حالت‌ها پس از هر خط:
+
+```text
+-- شروع
+P Q : Prop
+⊢ P ∧ Q → Q ∧ P
+
+-- پس از intro h1
+h1 : P ∧ Q
+⊢ Q ∧ P
+
+-- پس از obtain ⟨h2, h3⟩ := h1
+h2 : P
+h3 : Q
+⊢ Q ∧ P
+
+-- پس از constructor: دو هدف
+case left   ⊢ Q
+case right  ⊢ P
+```
+
+هر `·` یک هدف را می‌بندد. تاکتیک‌های اصلی و اثرشان:
+
+| تاکتیک | اثر |
+|---|---|
+| `intro h` | از هدف `A → B`، فرض `h : A` را به متن اضافه می‌کند و هدف را `B` می‌کند |
+| `exact h` | هدف را با فرض (یا عبارت) `h` می‌بندد |
+| `constructor` | هدف `A ∧ B` را به دو هدف `A` و `B` می‌شکند |
+| `left` / `right` | برای هدف `A ∨ B` یک طرف را انتخاب می‌کند |
+| `obtain ⟨h1, h2⟩ := h` | فرض `A ∧ B` را باز می‌کند |
+| `rcases h with h1 \| h2` | روی `A ∨ B` حالت‌بندی می‌کند و دو هدف می‌سازد |
+| `apply h` | با `h : A → B` هدف `B` را به `A` تبدیل می‌کند (استدلال به عقب) |
+
+### آزمایش
+
+قضیه را انتخاب کن و با دکمه‌ها اثبات را بساز. تاکتیک نامناسب خطا می‌دهد. دکمهٔ «نمایش اثبات کامل» هم یک اثبات درست را با انیمیشن بازپخش می‌کند. نام فرض‌ها (`h1`، `h2`، …) به ترتیب ساخته می‌شود.
+
+<figure>
+  <TacticDemo client:visible />
+  <figcaption>شکل ۳ (تعاملی) — شبیه‌ساز تاکتیک برای منطق گزاره‌ها. آنچه در کادر می‌بینی همان شکل goal state و متن اسکریپت Lean است.</figcaption>
+</figure>
+
+<LeanBlock code={`theorem or_swap (P Q : Prop) : P ∨ Q → Q ∨ P := by
+  intro h1
+  rcases h1 with h2 | h3
+  · right
+    exact h2
+  · left
+    exact h3
+
+theorem imp_trans (P Q R : Prop) : (P → Q) → (Q → R) → (P → R) := by
+  intro h1
+  intro h2
+  intro h3
+  apply h2
+  apply h1
+  exact h3`} />
+
+در `imp_trans` از هدف `R` شروع می‌کنیم. `apply h2` می‌گوید «کافی است Q را ثابت کنم»، `apply h1` می‌گوید «کافی است P را ثابت کنم» و `exact h3` همین را دارد.
+
+### وقتی اثبات غلط است
+
+اگر ادعا را با اثبات اشتباه بنویسی، Lean دقیقاً می‌گوید چه چیزی نمی‌خواند:
+
+```lean
+theorem bad (P Q : Prop) : P ∧ Q → Q := by
+  intro h
+  exact h
+```
+
+```text
+error: Type mismatch
+  h
+has type
+  P ∧ Q
+but is expected to have type
+  Q
+```
+
+در این مثال باید `exact h.2` نوشت (مؤلفهٔ دوم زوج). و اگر هنوز اثبات نکرده‌ای، `sorry` راه فرار است:
+
+<LeanBlock code={`theorem unfinished (P : Prop) : P → P := by
+  sorry`} />
+
+Lean می‌پذیرد ولی هشدار `declaration uses sorry` می‌دهد. `sorry` یعنی «بعداً»؛ قضیه‌ای که `sorry` دارد ثابت نشده است.
+
+## ۴. استقرا: اثبات برای همهٔ اعداد
+
+اعداد طبیعی در Lean با دو سازنده تعریف می‌شوند: `zero` و `succ n` (یعنی $n+1$). هر عدد یا صفر است یا جانشین عددی کوچک‌تر. همین ساختار، اصل استقرا را می‌دهد: برای اثبات $P(n)$ برای همهٔ $n$، دو چیز کافی است:
+
+1. **پایه:** $P(0)$.
+2. **گام:** از $P(k)$ (فرض استقرا، `ih`) نتیجه شود $P(k+1)$.
+
+<figure>
+  <DominoDemo client:visible />
+  <figcaption>شکل ۴ (تعاملی) — استقرا مثل دومینو: پایه اولین را می‌اندازد و گام استقرا هر دومینو را به بعدی وصل می‌کند. با ▶ جلو برو.</figcaption>
+</figure>
+
+<LeanBlock code={`theorem zero_add' (n : Nat) : 0 + n = n := by
+  induction n with
+  | zero => rfl
+  | succ k ih => rw [Nat.add_succ, ih]`} />
+
+چرا این کار اثبات لازم دارد؟ چون جمع روی آرگومان **دوم** تعریف شده است: `n + 0` با محاسبه برابر `n` است ولی `0 + n` نه. پس `0 + n = n` برای متغیر `n` مستقیماً `rfl` نیست و به استقرا نیاز دارد.
+
+- `case zero`: هدف `0 + 0 = 0` است و با محاسبه درست است، پس `rfl`.
+- `case succ`: هدف `0 + (k + 1) = k + 1`. قاعدهٔ `Nat.add_succ` آن را به `(0 + k) + 1 = k + 1` بازنویسی می‌کند و `ih : 0 + k = k` کار را تمام می‌کند. `rw` بعد از بازنویسی خودش `rfl` را امتحان می‌کند.
+
+### مثال بزرگ‌تر: جمع ۱ تا n
+
+ابتدا جمع را به‌صورت برنامه تعریف می‌کنیم و محاسبه‌اش می‌کنیم. بعد قضیه‌ای می‌نویسیم که برای **همهٔ** `n` برقرار است. ضرب در ۲ لازم است تا تقسیم نداشته باشیم:
+
+<LeanBlock code={`def sumTo : Nat → Nat
+  | 0 => 0
+  | n + 1 => sumTo n + (n + 1)
+
+#eval sumTo 10
+
+theorem sumTo_formula (n : Nat) : 2 * sumTo n = n * (n + 1) := by
+  induction n with
+  | zero => rfl
+  | succ k ih =>
+    simp only [sumTo, Nat.mul_add, ih]
+    simp only [Nat.add_mul, Nat.mul_one, Nat.one_mul]
+    omega
+
+#print axioms sumTo_formula`} />
+
+خروجی واقعی:
+
+```text
+55
+'sumTo_formula' depends on axioms: [propext, Quot.sound]
+```
+
+`#eval` یک نمونه را حساب می‌کند: $1+\dots+10=55=10\cdot 11/2$. قضیه ولی برای هر $n$ برقرار است و تست هیچ‌گاه این را نمی‌دهد. `omega` تصمیم‌گیر عددی Lean برای معادلات خطی روی اعداد صحیح/طبیعی است و جبر آخر را می‌بندد.
+
+<figure>
+  <svg viewBox="0 0 520 190" width="520" role="img" aria-label="دو پلکان یک تا ۵ در کنار هم یک مستطیل ۵ در ۶ می‌سازند، پس مجموع نصف ۵ ضرب در ۶ است">
+    <g>
+      <g fill="var(--accent)" fill-opacity="0.35" stroke="var(--accent)">
+        <rect x="40" y="130" width="30" height="30" /><rect x="40" y="100" width="30" height="30" /><rect x="40" y="70" width="30" height="30" /><rect x="40" y="40" width="30" height="30" /><rect x="40" y="10" width="30" height="30" />
+        <rect x="70" y="130" width="30" height="30" /><rect x="70" y="100" width="30" height="30" /><rect x="70" y="70" width="30" height="30" /><rect x="70" y="40" width="30" height="30" />
+        <rect x="100" y="130" width="30" height="30" /><rect x="100" y="100" width="30" height="30" /><rect x="100" y="70" width="30" height="30" />
+        <rect x="130" y="130" width="30" height="30" /><rect x="130" y="100" width="30" height="30" />
+        <rect x="160" y="130" width="30" height="30" />
+      </g>
+      <g fill="var(--accent-3)" fill-opacity="0.35" stroke="var(--accent-3)">
+        <rect x="190" y="10" width="30" height="30" /><rect x="160" y="10" width="30" height="30" /><rect x="130" y="10" width="30" height="30" /><rect x="100" y="10" width="30" height="30" />
+        <rect x="160" y="40" width="30" height="30" /><rect x="130" y="40" width="30" height="30" /><rect x="100" y="40" width="30" height="30" />
+        <rect x="160" y="70" width="30" height="30" /><rect x="130" y="70" width="30" height="30" />
+        <rect x="160" y="100" width="30" height="30" />
+        <rect x="190" y="40" width="30" height="30" /><rect x="190" y="70" width="30" height="30" /><rect x="190" y="100" width="30" height="30" /><rect x="190" y="130" width="30" height="30" />
+      </g>
+    </g>
+    <g font-size="15">
+      <text x="250" y="60">دو پلکان ۱+…+۵ یک مستطیل</text>
+      <text x="250" y="90" class="math">5 × 6 = 30 می‌سازند</text>
+      <text x="250" y="130" class="math">2·(1+…+5) = 5·6 = 30</text>
+      <text x="250" y="160" class="math">⇒ 15 = 30/2</text>
+    </g>
+  </svg>
+  <figcaption>شکل ۵ — شهودِ همان قضیه: دو نسخهٔ پلکان یک مستطیل $n\times(n+1)$ می‌سازند. Lean همین را بدون تکیه بر شکل، از روی دو گام استقرا ثابت می‌کند.</figcaption>
+</figure>
+
+## ۵. Mathlib و پروژه‌های بزرگ
+
+نوشتن همه‌چیز از صفر عملی نیست. **Mathlib** کتابخانهٔ ریاضی Lean است: جبر، آنالیز، توپولوژی و هزاران قضیه، با تاکتیک‌های قدرتمند مثل `simp`، `ring`، `linarith`. معمولاً کار روزمره این است که قضیهٔ مناسب را در Mathlib پیدا و ترکیب کنی. نمونه‌هایی که با Lean صورت‌بندی و تأیید شده‌اند (منابع باید پیش از استناد دقیق بررسی شوند):
+
+- حکم‌های بسیار بزرگ مثل آنچه در پروژهٔ Liquid Tensor Experiment چک شد.
+- بخش‌هایی از اثبات‌های جدید ترکیبیاتی و تحلیلی.
+
+در مهندسی نرم‌افزار هم مشابه این‌ها را می‌بینی: Lean خودش برنامهٔ Lean است [۱]، و می‌توان خاصیت برنامه را کنار خود برنامه ثابت کرد؛ مثل `sumTo_formula` بالا.
+
+## ۶. این روش چه چیزی را تضمین نمی‌کند
+
+<figure>
+  <svg viewBox="0 0 560 200" width="560" role="img" aria-label="سه لایهٔ اعتماد: kernel و آکسیوم‌ها، تعریف‌ها و صورت‌بندی قضیه، و ترجمهٔ انسان از مسئله به قضیه">
+    <g fill="var(--surface-2)" stroke="var(--border)">
+      <rect x="10" y="10" width="540" height="55" rx="6" />
+      <rect x="10" y="75" width="540" height="55" rx="6" />
+      <rect x="10" y="140" width="540" height="55" rx="6" />
+    </g>
+    <g font-size="15">
+      <text x="30" y="35">۱. kernel و آکسیوم‌ها</text><text x="30" y="55" font-size="13">ماشین چک می‌کند؛ کوچک و قابل بازبینی</text>
+      <text x="30" y="100">۲. تعریف‌ها و صورت‌بندی قضیه</text><text x="30" y="120" font-size="13">Lean فقط می‌گوید «این جمله ثابت شد» نه «جمله همان مسئلهٔ تو است»</text>
+      <text x="30" y="165">۳. ترجمهٔ مسئله به قضیه</text><text x="30" y="185" font-size="13">کار انسان؛ بازبینی می‌خواهد</text>
+    </g>
+  </svg>
+  <figcaption>شکل ۶ — لایه‌های اعتماد. kernel خطای گام‌ها را می‌گیرد، نه خطای صورت‌بندی.</figcaption>
+</figure>
+
+<Callout type="warn" title="درست اثبات‌شده، اما ممکن است قضیهٔ اشتباهی باشد">
+
+اگر تعریف `sumTo` را اشتباه می‌نوشتی و قضیه‌ای مطابق همان تعریف اشتباه ثابت می‌کردی، Lean می‌پذیرفت. قضیه‌ای مثل «برنامه‌ام درست است» فقط وقتی ارزش دارد که مشخصهٔ «درست» را درست نوشته باشی. همیشه `#print axioms` و تعریف‌ها را بخوان؛ اگر `sorryAx` یا آکسیوم ناخواسته ببینی، اثبات کامل نیست.
+
+</Callout>
+
+هزینهٔ دیگر زمان است: صوری‌سازی یک صفحه استدلال می‌تواند ساعت‌ها طول بکشد. در ازایش، چیزی می‌گیری که کاغذ نمی‌دهد: اطمینان مکانیکی، قابلیت بازاستفاده و جستجوی دقیق در قضیه‌ها.
+
+## ۷. از کجا شروع کنیم
+
+1. [ویرایشگر آنلاین](https://live.lean-lang.org/) را باز کن و بلوک‌های بالا را اجرا کن.
+2. کتاب *Theorem Proving in Lean 4* [۲] و بازی *Natural Number Game* را برای تمرین منطق و استقرا بخوان.
+3. وقتی راحت شدی، Lean را با VS Code و `elan` نصب کن و به Mathlib [۳] نگاه کن.
+
+## منابع
+
+1. L. de Moura, S. Ullrich, «The Lean 4 Theorem Prover and Programming Language», CADE-28, Lecture Notes in Computer Science، ۲۰۲۱. DOI: 10.1007/978-3-030-79876-5_37
+2. J. Avigad, L. de Moura, S. Kong, S. Ullrich، *Theorem Proving in Lean 4*، مستندات رسمی: https://lean-lang.org/theorem_proving_in_lean4/
+3. Mathlib community، *Mathematics in Lean* و مستندات Mathlib: https://leanprover-community.github.io/
+4. W. A. Howard، «The formulae-as-types notion of construction»، ۱۹۶۹ (منتشر شده ۱۹۸۰)؛ تناظر Curry–Howard.
